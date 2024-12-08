@@ -1,0 +1,71 @@
+first time i was a cron job task that run daily that i have create by following these steps below;
+
+1. - crontab -e
+
+ 2: 
+
+MAILTO="juniordimoso8@gmail.com"
+0 2 * * * /home/dimoso/mfugajismartDO/MainProjectFolder/venv/bin/python /home/dimoso/mfugajismartDO/MainProjectFolder/manage.py check_wateja
+
+
+3. 
+
+- crontab -l
+
+4. 
+
+- sudo grep CRON /var/log/syslog
+
+so now my problem is i have another file under the folder called 'no_rejesho_scheduler', 
+App/
+    management/
+        commands/
+            __init__.py
+            run_scheduler.py
+            no_rejesho_scheduler.py
+
+so now i need to add a new cron job task which is in no_rejesho_scheduler.py file that will run automatically at saa tatu kamili asubuhi, so is it possible to add again this task inthe first file that i added the first task?
+so pass through my codes and give me a full working codes and explanations how i can implement this;
+my no_rejesho_scheduler codes are;
+from datetime import datetime, timedelta
+from django.utils.timezone import now
+from App.models import *
+
+
+def check_and_update_rejesho():
+    # Current date for tracking today
+    today = now().date()
+    yesterday = today - timedelta(days=1)
+
+    # Get users who haven't returned and have not been processed today
+    mteja_hai = WatejaWote2.objects.filter(Ni_Mteja_Hai=True, Amerejesha_Leo=False)
+
+    for mteja in mteja_hai:
+        if not MarejeshoCopies.objects.filter(
+            JinaKamiliLaMteja=mteja.JinaKamiliLaMteja, 
+            Created__date=today,
+            #reg_no=mteja.reg_no
+        ).exists():
+            # Increment JumlaYaFainiZote by 1000
+            mteja.JumlaYaFainiZote = (mteja.JumlaYaFainiZote or 0) + 1000
+            mteja.save()
+
+            # Copy data to MarejeshoCopies
+            MarejeshoCopies.objects.create(
+                JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+                SimuYaMteja=mteja.SimuYaMteja,
+                EmailYaMteja=mteja.EmailYaMteja,
+                Mahali=mteja.Mahali,
+                KiasiAnachokopa=mteja.KiasiAnachokopa,
+                KiasiAlicholipa=mteja.KiasiAlicholipa,
+                RejeshoKwaSiku=mteja.RejeshoKwaSiku,
+                JumlaYaDeni=mteja.JumlaYaDeni,
+                Riba=mteja.Riba,
+                AmesajiliwaNa=mteja.AmesajiliwaNa,
+                PichaYaMteja=mteja.PichaYaMteja,
+                Ni_Mteja_Hai=mteja.Ni_Mteja_Hai,
+                Up_To=mteja.Up_To,
+                #reg_no=mteja.reg_no,
+                FainiKwaSiku=1000
+            )
+        print(f"Task running for {mteja.JinaKamiliLaMteja}")
