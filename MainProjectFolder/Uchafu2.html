@@ -1,6 +1,31 @@
-i was hosting my project in digital ocean droplet, so  now i need to download a full project folder using digital ocean droplet console and store that project folder in my computer,
-the path to acces manage.py folder is '/home/dimoso/mfugajismartDO/MainProjectFolder'
+ i have clone django project from github in my digital ocean droplet console but when i'm trying to migrate i'm getting this error '   conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
+django.db.utils.OperationalError: FATAL:  password authentication failed for user "microfinance"
+FATAL:  password authentication failed for user "microfinance"
 
-please i need a full working method 
+(venv) dimoso@vmi2331811:~/MicrofinanceCo/MainProjectFolder$'
 
-scp -r root@137.184.204.91:/home/dimoso/mfugajismartDO/MainProjectFolder/media "/c/Users/DIMOSO JR/Downloads"
+i'm using postgres database and i was using this way to create it;
+create user microfinance;  
+create database microfinancedb;
+alter role microfinance with password 'Dimoso@9898';
+grant all previleges on database microfinancedb to microfinance;
+alter database microfinancedb owner to microfinance;
+
+
+ALTER Role microfinance SET client_encoding TO 'utf8';
+ALTER ROLE microfinance SET default_transaction_isolation TO 'read committed';
+ALTER ROLE microfinance SET timezone TO 'UTC';
+
+my settings.py file are;
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'microfinancedb',
+        'USER':'microfinance',
+        'PASSWORD':'Dimoso@9898',
+        'HOST':'localhost',
+        'PORT':'',
+    }
+}
+
+so where i have mistaked?

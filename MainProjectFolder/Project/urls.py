@@ -44,6 +44,7 @@ urlpatterns = [
     path('', include('App.urls')),
     path('Add/', include('AddAppViewSets.urls')),
     path('Account/', include('accounts.urls')),
+    path('microfinance/', include('MyTemplatesApp.urls')),
     
 
     #path('ckeditor/', include('ckeditor_uploader.urls')),

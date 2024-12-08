@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     #'ckeditor_uploader',
     'corsheaders', #to connect django and react
     'App',
+    'MyTemplatesApp',
     
     'AddAppViewSets',
     'accounts.apps.AccountsConfig',
@@ -166,12 +167,21 @@ USE_TZ = True
 
 
 
+# STATIC_URL = '/static/'
+# #STATICFILES_DIRS = [
+#     #os.path.join(BASE_DIR, 'static')
+
+
+# STATIC_ROOT = BASE_DIR / "static"
+# # CRISPY_TEMPLATE_PACK = "bootstrap4"
+
+
 STATIC_URL = '/static/'
 #STATICFILES_DIRS = [
     #os.path.join(BASE_DIR, 'static')
 
 
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = BASE_DIR / "MyTemplatesApp/static"
 # CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 
