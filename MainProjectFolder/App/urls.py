@@ -85,4 +85,11 @@ urlpatterns = [
     path('OngezaKituoView/', views.OngezaKituoView.as_view(), name='OngezaKituoView'),
 
 
+    path('GetVituoVyoteView/', views.GetVituoVyoteView.as_view(), name='GetVituoVyoteView'),
+    path('DeleteKituoView/<int:pk>/delete/', views.DeleteKituoView.as_view(), name='DeleteKituoView'),
+
+    path('GetMyUserView/', views.GetMyUserView.as_view(), name='GetMyUserView'),
+    path('DeleteMyUserView/<int:pk>/delete/', views.DeleteMyUserView.as_view(), name='DeleteMyUserView'),
+
+
 ]

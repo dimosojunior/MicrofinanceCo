@@ -33,7 +33,7 @@ SECRET_KEY = "x*za6xf&_80ofdpae!yzq61g9ffikkx9$*iygbl$j7rr4wlf8t"
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost','127.0.0.1','gegwajomicrofinance.net','www.gegwajomicrofinance.net','198.7.120.209']
+ALLOWED_HOSTS = ['localhost','127.0.0.1','gegwajomicrofinance.xyz','www.gegwajomicrofinance.xyz','198.7.120.209']
 
 
 # Application definition

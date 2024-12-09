@@ -356,6 +356,10 @@ class AddWatejaWoteView(APIView):
 
         #data['KiasiAnachokopa'] = deni_plus_riba
 
+        JinaKamiliLaMteja = data.get('JinaKamiliLaMteja', None)
+        EmailYaMteja = data.get('EmailYaMteja', None)
+        SimuYaMteja = data.get('SimuYaMteja', None)
+
 
         serializer = AddWatejaWoteSerializer(data=data)
 
@@ -384,9 +388,9 @@ class AddWatejaWoteView(APIView):
             # Email notification to admin
             myemail = "juniordimoso8@gmail.com"
             subject = "Gegwajo Microfinance"
-            message = f"Mteja amesajiliwa kikamilifu na  {request.user.username}"
+            message = f"Ndugu {JinaKamiliLaMteja}, usajili wako umekamilika na umepokea mkopo wa Tsh. {kiasi_anachokopa} ,  kiasi cha riba ni Tsh. {riba_kwa_mkopo}, jumla ya deni lako ni Tsh. {deni_plus_riba} unatakiwa kuleta rejesho la {rejesho_kwa_siku} kwa kila siku kwa siku zote 30. \n Kwa mawasiliano zaidi piga simu namba 0628431507"
             from_email = settings.EMAIL_HOST_USER
-            recipient_list = [myemail]
+            recipient_list = [EmailYaMteja]
             send_mail(subject, message, from_email, recipient_list, fail_silently=True)
 
             return Response(serializer.data, status=200)
@@ -712,6 +716,14 @@ class WatejaWoteCartView(APIView):
             reg_no=Mteja.reg_no,
             RejeshoLililoPokelewaLeo=KiasiChaRejeshoChaSiku
         )
+
+        # Email notification to admin
+        myemail = "juniordimoso8@gmail.com"
+        subject = "Gegwajo Microfinance"
+        message = f"Ndugu {Mteja.JinaKamiliLaMteja}, Rejesho lako la Tsh. {KiasiChaRejeshoChaSiku} limepokelewa kikamilifu. \n Jumla ya kiasi ulichokopa: {Mteja.KiasiAnachokopa} \n Jumla ya deni lililobaki: {Mteja.JumlaYaDeni} \n Tarehe uliyoanza mkopo: {Mteja.Created} \n Tarehe ya kumaliza mkopo wako: {Mteja.Up_To} \n Kwa mawasiliano zaidi, piga simu namba 0628431507"
+        from_email = settings.EMAIL_HOST_USER
+        recipient_list = [Mteja.EmailYaMteja]
+        send_mail(subject, message, from_email, recipient_list, fail_silently=True)
 
         return Response({'success': 'Items Added To Your Cart and Mteja details copied successfully'})
 
@@ -1999,3 +2011,152 @@ class OngezaKituoView(APIView):
 
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#----------------------------GET VITUO VYOTE--------------------------
+
+
+
+class GetVituoVyoteView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.user.username
+        login_user_JinaLaKituo = request.user.JinaLaKituo.JinaLaKituo
+        try:
+            page = int(request.query_params.get('page', 1))
+            page_size = int(request.query_params.get('page_size', 5))
+
+            # Filter entries for today
+            #today = now().date()
+            queryset = VituoVyote.objects.all(
+                #JinaLaKituo__icontains=login_user_JinaLaKituo,
+                #Nje_Ya_Mkata_Leo=True
+                #Created__date=today
+            ).order_by('-id')
+
+            # Calculate the total
+            #total_wateja = queryset.count() or 0
+
+            # Use pagination
+            paginator = PageNumberPagination()
+            paginator.page_size = page_size
+            page_items = paginator.paginate_queryset(queryset, request)
+
+            JumlaYaWote = queryset.count()
+
+            serializer = VituoVyoteSerializer(page_items, many=True)
+
+            response_data = {
+                'queryset': serializer.data,
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': page,
+                'JumlaYaWote': JumlaYaWote,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e), "queryset": [], "JumlaYaWote": 0}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+class DeleteKituoView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        #login_user_JinaLaKituo = request.user.JinaLaKituo.JinaLaKituo
+        try:
+            # Fetch the MarejeshoCopies instance
+            kituo = VituoVyote.objects.get(id=pk)
+
+            # Delete the kituoCopies instance
+            kituo.delete()
+
+            return Response({'message': 'Ripoti kimefutwa kikamilifu.'}, status=status.HTTP_200_OK)
+
+        except VituoVyote.DoesNotExist:
+            return Response({'error': 'kituo hakijapatikana.'}, status=status.HTTP_404_NOT_FOUND)
+        except VituoVyote.DoesNotExist:
+            return Response({'error': 'kituo hakijapatikana.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+class GetMyUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.user.username
+        login_user_JinaLaKituo = request.user.JinaLaKituo.JinaLaKituo
+        try:
+            page = int(request.query_params.get('page', 1))
+            page_size = int(request.query_params.get('page_size', 5))
+
+            # Filter entries for today
+            #today = now().date()
+            queryset = MyUser.objects.all(
+                #JinaLaKituo__icontains=login_user_JinaLaKituo,
+                #Nje_Ya_Mkata_Leo=True
+                #Created__date=today
+            ).order_by('-id')
+
+            # Calculate the total
+            #total_wateja = queryset.count() or 0
+
+            # Use pagination
+            paginator = PageNumberPagination()
+            paginator.page_size = page_size
+            page_items = paginator.paginate_queryset(queryset, request)
+
+            JumlaYaWote = queryset.count()
+
+            serializer = MyUserSerializer(page_items, many=True)
+
+            response_data = {
+                'queryset': serializer.data,
+                'total_pages': paginator.page.paginator.num_pages,
+                'current_page': page,
+                'JumlaYaWote': JumlaYaWote,
+            }
+
+            return Response(response_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e), "queryset": [], "JumlaYaWote": 0}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+class DeleteMyUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, pk):
+        #login_user_JinaLaKituo = request.user.JinaLaKituo.JinaLaKituo
+        try:
+            # Fetch the MarejeshoCopies instance
+            kituo = MyUser.objects.get(id=pk)
+
+            # Delete the kituoCopies instance
+            kituo.delete()
+
+            return Response({'message': 'User amefutwa kikamilifu.'}, status=status.HTTP_200_OK)
+
+        except MyUser.DoesNotExist:
+            return Response({'error': 'User hajapatikana.'}, status=status.HTTP_404_NOT_FOUND)
+        except MyUser.DoesNotExist:
+            return Response({'error': 'User hajapatikana.'}, status=status.HTTP_404_NOT_FOUND)

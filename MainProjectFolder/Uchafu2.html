@@ -1,31 +1,19 @@
- i have clone django project from github in my digital ocean droplet console but when i'm trying to migrate i'm getting this error '   conn = _connect(dsn, connection_factory=connection_factory, **kwasync)
-django.db.utils.OperationalError: FATAL:  password authentication failed for user "microfinance"
-FATAL:  password authentication failed for user "microfinance"
 
-(venv) dimoso@vmi2331811:~/MicrofinanceCo/MainProjectFolder$'
+server {
+    listen 80;
+    server_name gegwajomicrofinance.xyz 198.7.120.209  www.gegwajomicrofinance.xyz;
 
-i'm using postgres database and i was using this way to create it;
-create user microfinance;  
-create database microfinancedb;
-alter role microfinance with password 'Dimoso@9898';
-grant all previleges on database microfinancedb to microfinance;
-alter database microfinancedb owner to microfinance;
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/dimoso/MicrofinanceCo/MainProjectFolder/MyTemplatesApp;
+    }
 
+    location /media/ {
+        root /home/dimoso/MicrofinanceCo/MainProjectFolder;
+    }
 
-ALTER Role microfinance SET client_encoding TO 'utf8';
-ALTER ROLE microfinance SET default_transaction_isolation TO 'read committed';
-ALTER ROLE microfinance SET timezone TO 'UTC';
-
-my settings.py file are;
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'microfinancedb',
-        'USER':'microfinance',
-        'PASSWORD':'Dimoso@9898',
-        'HOST':'localhost',
-        'PORT':'',
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/dimoso/Project.sock;
     }
 }
-
-so where i have mistaked?
