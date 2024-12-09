@@ -71,6 +71,7 @@ class VerifyOTPSerializer(serializers.Serializer):
 
 
 class MyUserSerializer(serializers.ModelSerializer):
+    JinaLaKituo = VituoVyoteSerializer(many=False)
     
     class Meta:
         model = MyUser
