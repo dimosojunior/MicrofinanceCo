@@ -222,3 +222,13 @@ class RipotiSerializer(serializers.ModelSerializer):
     class Meta:
         model = Ripoti
         fields = '__all__'
+
+
+
+
+
+class JumbeZaWatejaSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = JumbeZaWateja
+        fields = '__all__'

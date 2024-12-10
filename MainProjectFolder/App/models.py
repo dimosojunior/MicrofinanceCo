@@ -513,3 +513,24 @@ class Ripoti(models.Model):
 
 
 
+
+
+
+
+
+
+class JumbeZaWateja(models.Model):
+    JinaKamiliLaMteja = models.CharField(verbose_name="Jina La Mteja",max_length=500, blank=True,null=True)
+    SimuYaMteja = models.IntegerField(verbose_name="Simu Ya Mteja", blank=True,null=True)
+    EmailYaMteja = models.EmailField(verbose_name="Email Ya Mteja",max_length=200, blank=True,null=True)
+    
+    Message = models.TextField(verbose_name="Ujumbe",max_length=10000, blank=True,null=True)
+    
+    Created = models.DateTimeField(auto_now_add=True)
+    Updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.Message}"
+    
+    class Meta:
+        verbose_name_plural = "Jumbe Za Wateja"

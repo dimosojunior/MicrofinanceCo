@@ -92,4 +92,10 @@ urlpatterns = [
     path('DeleteMyUserView/<int:pk>/delete/', views.DeleteMyUserView.as_view(), name='DeleteMyUserView'),
 
 
+
+
+
+
+    path('TumaMsgKwaMtejaView/', views.TumaMsgKwaMtejaView.as_view(), name='TumaMsgKwaMtejaView'),
+
 ]

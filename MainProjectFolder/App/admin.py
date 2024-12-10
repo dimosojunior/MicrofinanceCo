@@ -45,7 +45,11 @@ class VituoVyoteAdmin(ImportExportModelAdmin):
     list_filter =["Created"]
     search_fields = ["JinaLaKituo"]
 
-
+@admin.register(JumbeZaWateja)  
+class JumbeZaWatejaAdmin(ImportExportModelAdmin):
+    list_display = ["id","JinaKamiliLaMteja", "SimuYaMteja","Created", "Updated"]
+    list_filter =["Created"]
+    search_fields = ["JinaKamiliLaMteja"]
 
 @admin.register(WatejaWote)
 class WatejaWoteAdmin(ImportExportModelAdmin):
@@ -66,13 +70,14 @@ class WatejaWoteAdmin(ImportExportModelAdmin):
             obj.Created = now()  # Set `Created` if not already set
         obj.save()
 
-
-class WatejaWoteCartAdmin(admin.ModelAdmin):
+@admin.register(WatejaWoteCart)
+class WatejaWoteCartAdmin(ImportExportModelAdmin):
     list_display = ["id","JinaKamiliLaMteja","ordered", "total_price", "Created","Updated"]
     list_filter =["Created"]
     search_fields = ["JinaKamiliLaMteja"]
 
-class WatejaWoteCartItemsAdmin(admin.ModelAdmin):
+@admin.register(WatejaWoteCartItems)
+class WatejaWoteCartItemsAdmin(ImportExportModelAdmin):
     list_display = ["id","JinaKamiliLaMteja","cart", "Mteja","KiasiChaRejeshoChaSiku", "Created","Updated"]
     list_filter =["Created","Updated"]
     search_fields = ["JinaKamiliLaMteja"]
@@ -197,6 +202,6 @@ class RipotiAdmin(ImportExportModelAdmin):
             obj.Created = now()  # Set `Created` if not already set
         obj.save()
 
-admin.site.register(WatejaWoteCart, WatejaWoteCartAdmin)
-admin.site.register(WatejaWoteCartItems, WatejaWoteCartItemsAdmin)
+# admin.site.register(WatejaWoteCart, WatejaWoteCartAdmin)
+# admin.site.register(WatejaWoteCartItems, WatejaWoteCartItemsAdmin)
 

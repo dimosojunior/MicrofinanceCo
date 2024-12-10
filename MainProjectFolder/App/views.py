@@ -2160,3 +2160,69 @@ class DeleteMyUserView(APIView):
             return Response({'error': 'User hajapatikana.'}, status=status.HTTP_404_NOT_FOUND)
         except MyUser.DoesNotExist:
             return Response({'error': 'User hajapatikana.'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+
+
+
+
+
+
+
+
+
+
+#--------------------------TUMA MSG KWA MTEJA--------------------------------
+
+class TumaMsgKwaMtejaView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    # EG:http://127.0.0.1:8000/TumaMsgKwaMtejaView/?JinaKamiliLaMteja=Juma&EmailYaMteja=juniordimoso8@gmail.com&SimuYaMteja=234&KiasiAnachokopa=50000&KiasiAlicholipa=10000&RejeshoKwaSiku=2000&JumlaYaDeni=40000&Riba=1000
+
+    
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        data = request.data.copy()
+
+        JinaKamiliLaMteja = request.query_params.get('JinaKamiliLaMteja')
+        EmailYaMteja = request.query_params.get('EmailYaMteja')
+        SimuYaMteja = request.query_params.get('SimuYaMteja')
+
+        KiasiAnachokopa = int(request.query_params.get('KiasiAnachokopa'))
+        KiasiAlicholipa = int(request.query_params.get('KiasiAlicholipa'))
+        RejeshoKwaSiku = int(request.query_params.get('RejeshoKwaSiku'))
+        JumlaYaDeni = int(request.query_params.get('JumlaYaDeni'))
+        Riba = int(request.query_params.get('Riba'))
+
+
+
+        data['JinaKamiliLaMteja'] = JinaKamiliLaMteja
+        data['EmailYaMteja'] = EmailYaMteja
+        data['SimuYaMteja'] = SimuYaMteja
+
+
+        
+        Message = data.get('Message', None)
+        
+
+
+        serializer = JumbeZaWatejaSerializer(data=data)
+
+        if serializer.is_valid():
+            wateja = serializer.save()
+
+            
+
+            # Email notification to admin
+            myemail = "juniordimoso8@gmail.com"
+            subject = "Gegwajo Microfinance"
+            message = f"Ndugu {JinaKamiliLaMteja}, {Message}. \n Kiasi ulichokopa ni Tsh. {KiasiAnachokopa} \n Kiasi ulicholipa ni Tsh. {KiasiAlicholipa} \n jumla ya deni lililobaki ni Tsh. {JumlaYaDeni}  \n Kwa mawasiliano zaidi piga simu namba 0628431507"
+            from_email = settings.EMAIL_HOST_USER
+            recipient_list = [EmailYaMteja]
+            send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
+            return Response(serializer.data, status=200)
+        return Response(serializer.errors, status=400)
