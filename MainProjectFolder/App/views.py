@@ -2188,7 +2188,7 @@ class TumaMsgKwaMtejaView(APIView):
         data = request.data.copy()
 
         JinaKamiliLaMteja = request.query_params.get('JinaKamiliLaMteja')
-        EmailYaMteja = request.query_params.get('EmailYaMteja')
+        #EmailYaMteja = request.query_params.get('EmailYaMteja')
         SimuYaMteja = request.query_params.get('SimuYaMteja')
 
         KiasiAnachokopa = int(request.query_params.get('KiasiAnachokopa'))
@@ -2200,7 +2200,7 @@ class TumaMsgKwaMtejaView(APIView):
 
 
         data['JinaKamiliLaMteja'] = JinaKamiliLaMteja
-        data['EmailYaMteja'] = EmailYaMteja
+        #data['EmailYaMteja'] = EmailYaMteja
         data['SimuYaMteja'] = SimuYaMteja
 
 
