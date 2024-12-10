@@ -2221,7 +2221,7 @@ class TumaMsgKwaMtejaView(APIView):
             subject = "Gegwajo Microfinance"
             message = f"Ndugu {JinaKamiliLaMteja}, {Message}. \n Kiasi ulichokopa ni Tsh. {KiasiAnachokopa} \n Kiasi ulicholipa ni Tsh. {KiasiAlicholipa} \n jumla ya deni lililobaki ni Tsh. {JumlaYaDeni}  \n Kwa mawasiliano zaidi piga simu namba 0628431507"
             from_email = settings.EMAIL_HOST_USER
-            recipient_list = [EmailYaMteja]
+            recipient_list = [myemail]
             send_mail(subject, message, from_email, recipient_list, fail_silently=True)
 
             return Response(serializer.data, status=200)
