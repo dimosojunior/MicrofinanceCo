@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'AddAppViewSets',
     'accounts.apps.AccountsConfig',
     'import_export',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -96,24 +97,24 @@ AUTH_USER_MODEL="App.MyUser"
 # Database
 # https://docs.djangoproject.com/en/2.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'microfinancedb',
-        'USER':'microfinance',
-        'PASSWORD':'Dimoso@9898',
-        'HOST':'localhost',
-        'PORT':'',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
+
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': 'microfinancedb',
+#         'USER':'microfinance',
+#         'PASSWORD':'Dimoso@9898',
+#         'HOST':'localhost',
+#         'PORT':'',
+#     }
+# }
 
 
 
@@ -202,7 +203,7 @@ MEDIA_ROOT= BASE_DIR / "media"
 # }
 
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'mfugajismart.taarifa@gmail.com'

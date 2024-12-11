@@ -235,6 +235,8 @@ class WatejaWote(models.Model):
 
     Nje_Ya_Mkata_Wote = models.BooleanField(default=False, blank=True, null=True)
     Nje_Ya_Mkata_Leo = models.BooleanField(default=False, blank=True, null=True)
+
+    Wamemaliza_Hawajakopa_Tena = models.BooleanField(default=False, blank=True, null=True)
     
     
     Up_To = models.DateTimeField(auto_now_add=False, blank=True, null=True)
@@ -283,28 +285,28 @@ class WatejaWote(models.Model):
             return None  # Rudisha None ikiwa Created haijajazwa
         # Example calculation for time left
         time_elapsed = (timezone.now() - self.Created).days
-        print(f"Time Since: {time_elapsed}")
+        #print(f"Time Since: {time_elapsed}")
     
         # Update day_is_reached to True if remaining_days is equal to 1
 
         
 
-        if time_elapsed == 30 and not self.Nje_Ya_Mkata_Leo:
-            self.Nje_Ya_Mkata_Leo = True
-            self.save(update_fields=['Nje_Ya_Mkata_Leo'])
+        # if time_elapsed == 30 and not self.Nje_Ya_Mkata_Leo:
+        #     self.Nje_Ya_Mkata_Leo = True
+        #     self.save(update_fields=['Nje_Ya_Mkata_Leo'])
 
-        if time_elapsed == 31 and self.Ni_Mteja_Hai:
-            self.Ni_Mteja_Hai = False
-            self.Nje_Ya_Mkata_Leo = False
-            self.save(update_fields=['Ni_Mteja_Hai','Nje_Ya_Mkata_Leo'])
+        # if time_elapsed == 31 and self.Ni_Mteja_Hai:
+        #     self.Ni_Mteja_Hai = False
+        #     self.Nje_Ya_Mkata_Leo = False
+        #     self.save(update_fields=['Ni_Mteja_Hai','Nje_Ya_Mkata_Leo'])
 
-        if time_elapsed == 31 and self.Nje_Ya_Mkata_Leo:
-            self.Nje_Ya_Mkata_Leo = False
-            self.save(update_fields=['Nje_Ya_Mkata_Leo'])
+        # if time_elapsed == 31 and self.Nje_Ya_Mkata_Leo:
+        #     self.Nje_Ya_Mkata_Leo = False
+        #     self.save(update_fields=['Nje_Ya_Mkata_Leo'])
 
-        if time_elapsed == 31 and not self.Nje_Ya_Mkata_Wote:
-            self.Nje_Ya_Mkata_Wote = True
-            self.save(update_fields=['Nje_Ya_Mkata_Wote'])
+        # if time_elapsed == 31 and not self.Nje_Ya_Mkata_Wote:
+        #     self.Nje_Ya_Mkata_Wote = True
+        #     self.save(update_fields=['Nje_Ya_Mkata_Wote'])
 
         return time_elapsed
 

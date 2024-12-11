@@ -110,7 +110,7 @@ from django.http import JsonResponse
 #from beem.sms import BeemSms  # Correct import
 
 #from BeemAfrica import Authorize, AirTime, OTP, SMS
-
+from django.utils.timezone import now
 
 
 class ChangePasswordView(APIView):
@@ -367,7 +367,7 @@ class AddWatejaWoteView(APIView):
             wateja = serializer.save()
 
             # Calculate and set `Up_To`
-            wateja.Up_To = wateja.Created + timedelta(days=29)
+            wateja.Up_To = wateja.Created + timedelta(days=30)
             
             wateja.KiasiAnachokopa = deni_plus_riba
             wateja.Ni_Mteja_Hai = True
@@ -375,6 +375,7 @@ class AddWatejaWoteView(APIView):
             wateja.Amerejesha_Leo = False
             wateja.Nje_Ya_Mkata_Wote = False
             wateja.Nje_Ya_Mkata_Leo = False
+            wateja.Wamemaliza_Hawajakopa_Tena = False
 
             wateja.save()
 
@@ -383,12 +384,14 @@ class AddWatejaWoteView(APIView):
             # message = f"Habari {wateja.JinaKamiliLaMteja}, umesajiliwa kikamilifu. Kiasi cha mkopo: {kiasi_anachokopa} TZS."
             # sms_response = self.send_sms(phone_number, message)
 
+            print(f"Jina la Mteja {JinaKamiliLaMteja}")
+
             
 
             # Email notification to admin
             myemail = "juniordimoso8@gmail.com"
-            subject = "Gegwajo Microfinance"
-            message = f"Ndugu {JinaKamiliLaMteja}, usajili wako umekamilika na umepokea mkopo wa Tsh. {kiasi_anachokopa} ,  kiasi cha riba ni Tsh. {riba_kwa_mkopo}, jumla ya deni lako ni Tsh. {deni_plus_riba} unatakiwa kuleta rejesho la {rejesho_kwa_siku} kwa kila siku kwa siku zote 30. \n Kwa mawasiliano zaidi piga simu namba 0628431507"
+            subject = "GGJ - MKOPO"
+            message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
             from_email = settings.EMAIL_HOST_USER
             recipient_list = [EmailYaMteja]
             send_mail(subject, message, from_email, recipient_list, fail_silently=True)
@@ -396,6 +399,108 @@ class AddWatejaWoteView(APIView):
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
 
+# Update Post View
+class UpdateWatejaWotePostView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def put(self, request, pk):
+        try:
+            post = WatejaWote.objects.get(
+                id=pk 
+                #username=request.user.username
+            )
+
+
+            user = request.user
+            data = request.data.copy()
+
+            # Automatically fill in fields from the user
+            data['AmesajiliwaNa'] = user.username
+
+            # Ensure 'KiasiAnachokopa' is provided
+            kiasi_anachokopa = data.get('KiasiAnachokopa', None)
+            if not kiasi_anachokopa:
+                return Response({"error": "KiasiAnachokopa is required"}, status=400)
+
+            kiasi_anachokopa = int(kiasi_anachokopa)
+            riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
+            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+
+            # Perform calculations
+            rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+            
+            # Assign calculated fields to the data
+            data['RejeshoKwaSiku'] = int(rejesho_kwa_siku)
+            data['JumlaYaDeni'] = deni_plus_riba
+            data['Riba'] = riba_kwa_mkopo
+
+            #data['KiasiAnachokopa'] = deni_plus_riba
+
+            JinaKamiliLaMteja = data.get('JinaKamiliLaMteja', None)
+            EmailYaMteja = data.get('EmailYaMteja', None)
+            SimuYaMteja = data.get('SimuYaMteja', None)
+
+            serializer = AddWatejaWoteSerializer(post, 
+                data=request.data, 
+                partial=True
+            )
+
+            if serializer.is_valid():
+                #serializer.save()
+
+                wateja = serializer.save()
+
+                print(f"Deleting MarejeshoCopies with reg_no={wateja.reg_no}")
+                MarejeshoCopies.objects.filter(
+                    #JinaKamiliLaMteja=wateja.JinaKamiliLaMteja,
+                    reg_no=wateja.reg_no
+                ).delete()
+
+                # Calculate and set `Up_To`
+                wateja.Up_To = wateja.Created + timedelta(days=30)
+                
+                wateja.KiasiAnachokopa = deni_plus_riba
+                wateja.RejeshoKwaSiku = rejesho_kwa_siku
+                wateja.JumlaYaDeni = deni_plus_riba
+                wateja.Riba = riba_kwa_mkopo
+                
+
+
+                wateja.Ni_Mteja_Hai = True
+
+                wateja.Amerejesha_Leo = False
+                wateja.Nje_Ya_Mkata_Wote = False
+                wateja.Nje_Ya_Mkata_Leo = False
+                wateja.Wamemaliza_Hawajakopa_Tena = False
+
+                wateja.save()
+
+
+
+                #print("HELLLO TANZANIA")
+
+                # Send SMS notification to the registered mteja
+                # phone_number = data.get('SimuYaMteja')
+                # message = f"Habari {wateja.JinaKamiliLaMteja}, umesajiliwa kikamilifu. Kiasi cha mkopo: {kiasi_anachokopa} TZS."
+                # sms_response = self.send_sms(phone_number, message)
+
+                
+
+                # Email notification to admin
+                myemail = "juniordimoso8@gmail.com"
+                subject = "GGJ - MKOPO"
+                message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [EmailYaMteja]
+                send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
+
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except WatejaWote.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class GetAllWatejaWoteView(APIView):
@@ -450,27 +555,6 @@ class GetAllWatejaWoteView(APIView):
 
 
 
-# Update Post View
-class UpdateWatejaWotePostView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def put(self, request, pk):
-        try:
-            post = WatejaWote.objects.get(
-                id=pk 
-                #username=request.user.username
-            )
-            serializer = WatejaWoteSerializer(post, 
-                data=request.data, 
-                partial=True
-            )
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except WatejaWote.DoesNotExist:
-            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
 # Delete Post View
 class DeleteWatejaWotePostView(APIView):
@@ -652,6 +736,8 @@ class WatejaWoteCartView(APIView):
 
 
     def post(self, request):
+        today = now().date()
+
         data = request.data
         JinaKamiliLaMteja = request.query_params.get('JinaKamiliLaMteja')
 
@@ -687,6 +773,13 @@ class WatejaWoteCartView(APIView):
         Mteja.KiasiAlicholipa = Mteja.KiasiAnachokopa - remained_deni
 
         Mteja.Amerejesha_Leo = True
+
+        # Check if JumlaYaDeni is less than or equal to zero
+        if Mteja.JumlaYaDeni <= 0:
+            Mteja.Ni_Mteja_Hai = False
+            Mteja.Wamemaliza_Hawajakopa_Tena = True
+
+        # if Mteja.JumlaYaDeni <= 0 and Nje_Ya_Mkata_Wote == True :
         Mteja.save()
 
         # Update cart total price
@@ -719,8 +812,8 @@ class WatejaWoteCartView(APIView):
 
         # Email notification to admin
         myemail = "juniordimoso8@gmail.com"
-        subject = "Gegwajo Microfinance"
-        message = f"Ndugu {Mteja.JinaKamiliLaMteja}, Rejesho lako la Tsh. {KiasiChaRejeshoChaSiku} limepokelewa kikamilifu. \n Jumla ya kiasi ulichokopa: {Mteja.KiasiAnachokopa} \n Jumla ya deni lililobaki: {Mteja.JumlaYaDeni} \n Tarehe uliyoanza mkopo: {Mteja.Created} \n Tarehe ya kumaliza mkopo wako: {Mteja.Up_To} \n Kwa mawasiliano zaidi, piga simu namba 0628431507"
+        subject = "GGJ - MKOPO"
+        message = f"Ndugu {Mteja.JinaKamiliLaMteja}, tumepokea rejesho lako la Tsh {KiasiChaRejeshoChaSiku}/= tarehe {today}. Deni lako ni Tsh {Mteja.JumlaYaDeni}/= \n Mawasiliano: 0621690739 / 0747462389. "
         from_email = settings.EMAIL_HOST_USER
         recipient_list = [Mteja.EmailYaMteja]
         send_mail(subject, message, from_email, recipient_list, fail_silently=True)
@@ -1175,7 +1268,9 @@ class GetWamemalizaHawajakopaTenaView(APIView):
             #today = now().date()
             queryset = WatejaWote.objects.filter(
                 JinaLaKituo__icontains=login_user_JinaLaKituo,
-                Nje_Ya_Mkata_Wote=True,
+                Nje_Ya_Mkata_Wote=False,
+                Ni_Mteja_Hai=False,
+                Wamemaliza_Hawajakopa_Tena=True,
                 JumlaYaDeni__lte=0
                 #Created__date=today
             ).order_by('JinaKamiliLaMteja')
@@ -1344,7 +1439,7 @@ class GetFainiWatejaWoteHaiView2(APIView):
 #             wateja = serializer.save()
 
 #             # # Calculate and set `Up_To`
-#             # wateja.Up_To = wateja.Created + timedelta(days=29)
+#             # wateja.Up_To = wateja.Created + timedelta(days=30)
 #             # wateja.save()
 
 #             # Email notification to admin
@@ -1460,10 +1555,12 @@ class AddRipotiView(APIView):
 
             #Copy Amerejesha_Leo = False to another model
             # Copy relevant records to MarejeshoCopies
+            #ili mtu apigwe faini ni lazima hizo condition zote zifuatwe
             mteja_hai = WatejaWote.objects.filter(
                 JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
                 Ni_Mteja_Hai=True,
-                Amerejesha_Leo=False
+                Amerejesha_Leo=False,
+                Nje_Ya_Mkata_Wote=False
             )
             for mteja in mteja_hai:
                 if not MarejeshoCopies.objects.filter(
@@ -1758,6 +1855,8 @@ class DeleteRejeshoView(APIView):
 
             # Reset Amerejesha_Leo to False
             mteja.Amerejesha_Leo = False
+            mteja.Ni_Mteja_Hai = True
+            mteja.Wamemaliza_Hawajakopa_Tena = False
             mteja.save()
 
             # Delete the MarejeshoCopies instance

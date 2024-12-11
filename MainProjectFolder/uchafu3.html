@@ -1,71 +1,191 @@
-first time i was a cron job task that run daily that i have create by following these steps below;
+below are my django views for updating taarifa za wateja in WatejaWote model but after updating it i'm going to another model called MarejeshoCopies and i filtered all inofrmations with a reg_no similar to that of updated one and delete those informations, but the problem is the informations are not deleted please check where there is a problem, why it fails to delete informations in MarejeshoCopies model.
+my views.py codes are;
+class UpdateWatejaWotePostView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
 
-1. - crontab -e
-
- 2: 
-
-MAILTO="juniordimoso8@gmail.com"
-0 2 * * * /home/dimoso/mfugajismartDO/MainProjectFolder/venv/bin/python /home/dimoso/mfugajismartDO/MainProjectFolder/manage.py check_wateja
-
-
-3. 
-
-- crontab -l
-
-4. 
-
-- sudo grep CRON /var/log/syslog
-
-so now my problem is i have another file under the folder called 'no_rejesho_scheduler', 
-App/
-    management/
-        commands/
-            __init__.py
-            run_scheduler.py
-            no_rejesho_scheduler.py
-
-so now i need to add a new cron job task which is in no_rejesho_scheduler.py file that will run automatically at saa tatu kamili asubuhi, so is it possible to add again this task inthe first file that i added the first task?
-so pass through my codes and give me a full working codes and explanations how i can implement this;
-my no_rejesho_scheduler codes are;
-from datetime import datetime, timedelta
-from django.utils.timezone import now
-from App.models import *
-
-
-def check_and_update_rejesho():
-    # Current date for tracking today
-    today = now().date()
-    yesterday = today - timedelta(days=1)
-
-    # Get users who haven't returned and have not been processed today
-    mteja_hai = WatejaWote2.objects.filter(Ni_Mteja_Hai=True, Amerejesha_Leo=False)
-
-    for mteja in mteja_hai:
-        if not MarejeshoCopies.objects.filter(
-            JinaKamiliLaMteja=mteja.JinaKamiliLaMteja, 
-            Created__date=today,
-            #reg_no=mteja.reg_no
-        ).exists():
-            # Increment JumlaYaFainiZote by 1000
-            mteja.JumlaYaFainiZote = (mteja.JumlaYaFainiZote or 0) + 1000
-            mteja.save()
-
-            # Copy data to MarejeshoCopies
-            MarejeshoCopies.objects.create(
-                JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
-                SimuYaMteja=mteja.SimuYaMteja,
-                EmailYaMteja=mteja.EmailYaMteja,
-                Mahali=mteja.Mahali,
-                KiasiAnachokopa=mteja.KiasiAnachokopa,
-                KiasiAlicholipa=mteja.KiasiAlicholipa,
-                RejeshoKwaSiku=mteja.RejeshoKwaSiku,
-                JumlaYaDeni=mteja.JumlaYaDeni,
-                Riba=mteja.Riba,
-                AmesajiliwaNa=mteja.AmesajiliwaNa,
-                PichaYaMteja=mteja.PichaYaMteja,
-                Ni_Mteja_Hai=mteja.Ni_Mteja_Hai,
-                Up_To=mteja.Up_To,
-                #reg_no=mteja.reg_no,
-                FainiKwaSiku=1000
+    def put(self, request, pk):
+        try:
+            post = WatejaWote.objects.get(
+                id=pk 
+                #username=request.user.username
             )
-        print(f"Task running for {mteja.JinaKamiliLaMteja}")
+
+
+            user = request.user
+            data = request.data.copy()
+
+            # Automatically fill in fields from the user
+            data['AmesajiliwaNa'] = user.username
+
+            # Ensure 'KiasiAnachokopa' is provided
+            kiasi_anachokopa = data.get('KiasiAnachokopa', None)
+            if not kiasi_anachokopa:
+                return Response({"error": "KiasiAnachokopa is required"}, status=400)
+
+            kiasi_anachokopa = int(kiasi_anachokopa)
+            riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
+            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+
+            # Perform calculations
+            rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+            
+            # Assign calculated fields to the data
+            data['RejeshoKwaSiku'] = int(rejesho_kwa_siku)
+            data['JumlaYaDeni'] = deni_plus_riba
+            data['Riba'] = riba_kwa_mkopo
+
+            #data['KiasiAnachokopa'] = deni_plus_riba
+
+            JinaKamiliLaMteja = data.get('JinaKamiliLaMteja', None)
+            EmailYaMteja = data.get('EmailYaMteja', None)
+            SimuYaMteja = data.get('SimuYaMteja', None)
+
+            serializer = AddWatejaWoteSerializer(post, 
+                data=request.data, 
+                partial=True
+            )
+
+            if serializer.is_valid():
+                #serializer.save()
+
+                wateja = serializer.save()
+
+                # Calculate and set `Up_To`
+                wateja.Up_To = wateja.Created + timedelta(days=30)
+                
+                wateja.KiasiAnachokopa = deni_plus_riba
+                wateja.RejeshoKwaSiku = rejesho_kwa_siku
+                wateja.JumlaYaDeni = deni_plus_riba
+                wateja.Riba = riba_kwa_mkopo
+                
+
+
+                wateja.Ni_Mteja_Hai = True
+
+                wateja.Amerejesha_Leo = False
+                wateja.Nje_Ya_Mkata_Wote = False
+                wateja.Nje_Ya_Mkata_Leo = False
+                wateja.Wamemaliza_Hawajakopa_Tena = False
+
+                wateja.save()
+
+
+                MarejeshoCopies.objects.filter(
+                    #JinaKamiliLaMteja=wateja.JinaKamiliLaMteja,
+                    reg_no=wateja.reg_no
+                ).delete()
+
+                #print("HELLLO TANZANIA")
+
+                # Send SMS notification to the registered mteja
+                # phone_number = data.get('SimuYaMteja')
+                # message = f"Habari {wateja.JinaKamiliLaMteja}, umesajiliwa kikamilifu. Kiasi cha mkopo: {kiasi_anachokopa} TZS."
+                # sms_response = self.send_sms(phone_number, message)
+
+                
+
+                # Email notification to admin
+                myemail = "juniordimoso8@gmail.com"
+                subject = "GGJ - MKOPO"
+                message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
+                from_email = settings.EMAIL_HOST_USER
+                recipient_list = [EmailYaMteja]
+                send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
+
+
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except WatejaWote.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+my models are;
+class WatejaWote(models.Model):
+    reg_no= models.CharField(max_length=100000, default=generated_reg_no, unique=True, editable=False,blank=True,null=True)
+    
+    
+    JinaKamiliLaMteja = models.CharField(verbose_name="Jina Kamili La Mteja", max_length=500,blank=True,null=True)
+    JinaLaKituo = models.ForeignKey(VituoVyote, on_delete=models.PROTECT, blank=True,null=True) 
+
+    SimuYaMteja = models.IntegerField(verbose_name="Namba Ya Simu Ya Mteja", blank=True,null=True)
+    SimuYaMzaminiWa1 = models.IntegerField(verbose_name="Namba Ya Simu Ya Mzamini Wa 1", blank=True,null=True)
+    SimuYaMzaminiWa2 = models.IntegerField(verbose_name="Namba Ya Simu Ya Mzamini Wa 2", blank=True,null=True)
+    JinaLaMzaminiWa1 = models.CharField(verbose_name="Jina Kamili La Mzamini Wa 1", max_length=500,blank=True,null=True)
+    JinaLaMzaminiWa2 = models.CharField(verbose_name="Jina Kamili La Mzamini Wa 2", max_length=500,blank=True,null=True)
+
+    EmailYaMteja = models.EmailField(verbose_name="Email Ya Mteja", max_length=500,blank=True,null=True)
+    Mahali = models.CharField(verbose_name="Mahali Anapoishi", max_length=500,blank=True,null=True)
+    MaelezoYaMteja = models.TextField(verbose_name="Maelezo Ya Mteja", max_length=10000,blank=True,null=True)
+
+    KiasiAnachokopa = models.IntegerField(verbose_name="Kiasi Kiasi Anachokopa", blank=True,null=True, default=0)
+    KiasiAlicholipa = models.IntegerField(verbose_name="Kiasi Alicholipa Mpaka Sasa", blank=True,null=True, default=0)
+    RejeshoKwaSiku = models.IntegerField(verbose_name="Rejesho Kwa Siku", blank=True,null=True, default=0)
+    JumlaYaDeni = models.IntegerField(verbose_name="Jumla Ya Deni Analodaiwa", blank=True,null=True, default=0)
+    Riba = models.IntegerField(verbose_name="Riba", blank=True,null=True, default=0)
+
+    AmesajiliwaNa = models.CharField(verbose_name="Amesajiliwa Na ?", max_length=500,blank=True,null=True)
+    Amerejesha_Leo = models.BooleanField(default=False, blank=True, null=True)
+    
+    PichaYaMteja = models.ImageField(verbose_name="Picha Ya Mteja", upload_to='media/PichaZaVyakula/',blank=True,null=True)
+
+    #if created is greater than 30 inakuwa false
+    Ni_Mteja_Hai = models.BooleanField(default=True, blank=True, null=True)
+
+    Nje_Ya_Mkata_Wote = models.BooleanField(default=False, blank=True, null=True)
+    Nje_Ya_Mkata_Leo = models.BooleanField(default=False, blank=True, null=True)
+
+    Wamemaliza_Hawajakopa_Tena = models.BooleanField(default=False, blank=True, null=True)
+    
+    
+    Up_To = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+
+    JumlaYaFainiZote = models.IntegerField(verbose_name="JumlaYaFainiZote", blank=True,null=True, default=0)
+
+    Created = models.DateTimeField(default=now, blank=True, null=True)
+    Updated = models.DateTimeField(auto_now=True)
+
+    time_left = models.IntegerField(blank=True, null=True)
+    is_red = models.BooleanField(default=False)
+
+    
+    
+    class Meta:
+        verbose_name_plural = "Wateja Wote"
+        
+    
+    def __str__(self):
+        return f" {self.JinaKamiliLaMteja} "
+
+
+class MarejeshoCopies(models.Model):
+    reg_no = models.CharField(verbose_name="Namba Ya Mteja", max_length=100000, blank=True, null=True)
+
+    JinaKamiliLaMteja = models.CharField(verbose_name="Jina Kamili La Mteja", max_length=500, blank=True, null=True)
+    JinaLaKituo = models.CharField(verbose_name="Jina La Kituo Cha Mteja", max_length=500, blank=True, null=True)
+    #JinaLaKituo = models.ForeignKey(VituoVyote, on_delete=models.PROTECT, blank=True, null=True)
+    SimuYaMteja = models.IntegerField(verbose_name="Namba Ya Simu Ya Mteja", blank=True, null=True)
+    EmailYaMteja = models.EmailField(verbose_name="Email Ya Mteja", max_length=500, blank=True, null=True)
+    Mahali = models.CharField(verbose_name="Mahali Anapoishi", max_length=500, blank=True, null=True)
+    KiasiAnachokopa = models.IntegerField(verbose_name="Kiasi Anachokopa", blank=True, null=True, default=0)
+    KiasiAlicholipa = models.IntegerField(verbose_name="Kiasi Alicholipa", blank=True, null=True, default=0)
+    RejeshoKwaSiku = models.IntegerField(verbose_name="Rejesho Kwa Siku", blank=True, null=True, default=0)
+    JumlaYaDeni = models.IntegerField(verbose_name="Jumla Ya Deni Analodaiwa", blank=True, null=True, default=0)
+    Riba = models.IntegerField(verbose_name="Riba", blank=True, null=True, default=0)
+    RejeshoLililoPokelewaLeo = models.IntegerField(verbose_name="Rejesho Lililo Pokelewa Leo", blank=True, null=True, default=0)
+    FainiKwaSiku = models.IntegerField(verbose_name="Faini Kwa Siku", blank=True, null=True, default=0)
+
+    AmesajiliwaNa = models.CharField(verbose_name="Amesajiliwa Na ?", max_length=500, blank=True, null=True)
+    PichaYaMteja = models.ImageField(verbose_name="Picha Ya Mteja", upload_to='media/PichaZaVyakula/', blank=True, null=True)
+    Ni_Mteja_Hai = models.BooleanField(default=True, blank=True, null=True)
+    Created = models.DateTimeField(default=now, blank=True, null=True)
+    Updated = models.DateTimeField(auto_now=True)
+    Up_To = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Marejesho Copies"
+
+    def __str__(self):
+        return f"{self.JinaKamiliLaMteja}"
