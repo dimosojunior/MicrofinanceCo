@@ -399,6 +399,26 @@ class AddWatejaWoteView(APIView):
             return Response(serializer.data, status=200)
         return Response(serializer.errors, status=400)
 
+
+
+
+# View for retrieving a post's details
+class RetrieveWatejaWoteView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, pk):
+        try:
+            post = WatejaWote.objects.get(
+                id=pk 
+                #username=request.user.username
+            )
+            serializer = AddWatejaWoteSerializer(post)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except WatejaWote.DoesNotExist:
+            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
 # Update Post View
 class UpdateWatejaWotePostView(APIView):
     authentication_classes = [TokenAuthentication]

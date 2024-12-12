@@ -17,7 +17,7 @@ urlpatterns = [
     path('WatejaWoteCart/', views.WatejaWoteCartView.as_view(), name='WatejaWoteCart'),
     #path('WatejaWoteOrder/', views.WatejaWoteOrderView.as_view(), name='WatejaWote--order-list'),
 
-
+    path('RetrieveWatejaWoteView/<int:pk>/', views.RetrieveWatejaWoteView.as_view(), name='RetrieveWatejaWoteView'),
     path('UpdateWatejaWotePostView/<int:pk>/edit/', views.UpdateWatejaWotePostView.as_view(), name='UpdateWatejaWotePostView'),
     path('DeleteWatejaWotePostView/<int:pk>/delete/', views.DeleteWatejaWotePostView.as_view(), name='DeleteWatejaWotePostView'),
     path('CountAllWatejaWoteView/', views.CountAllWatejaWoteView.as_view(), name='CountAllWatejaWoteView'),
