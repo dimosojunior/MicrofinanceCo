@@ -112,6 +112,14 @@ from django.http import JsonResponse
 #from BeemAfrica import Authorize, AirTime, OTP, SMS
 from django.utils.timezone import now
 
+#------------FOR TWILIO
+from twilio.rest import Client
+from dotenv import load_dotenv
+import os
+
+# Load environment variables
+load_dotenv()
+
 
 class ChangePasswordView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -388,7 +396,21 @@ class AddWatejaWoteView(APIView):
             # message = f"Habari {wateja.JinaKamiliLaMteja}, umesajiliwa kikamilifu. Kiasi cha mkopo: {kiasi_anachokopa} TZS."
             # sms_response = self.send_sms(phone_number, message)
 
-            print(f"Jina la Mteja {JinaKamiliLaMteja}")
+            print(f"Simu Ya Mteja {SimuYaMteja}")
+
+            account_sid = os.getenv("TWILIO_ACCOUNT_SID")
+            auth_token = os.getenv("TWILIO_AUTH_TOKEN")
+            sender_number = os.getenv("TWILIO_SENDER_NUMBER")
+
+            
+            client = Client(account_sid, auth_token)
+            message = client.messages \
+                        .create(
+                            body=f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389.",
+                            from_= sender_number,
+                            #to='+255744973421'
+                            to =f"+255{SimuYaMteja}"
+                        )
 
             
 
