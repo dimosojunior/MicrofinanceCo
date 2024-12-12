@@ -1,4 +1,4 @@
-
+CountAllWatejaWoteNjeYaMikataView
 
 
 from django.shortcuts import render, get_object_or_404, redirect
@@ -196,7 +196,8 @@ class CountAllWatejaWoteNjeYaMikataView(APIView):
             # Count active wateja (wateja_hai)
             wateja_hai = WatejaWote.objects.filter(
                 JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
-                Nje_Ya_Mkata_Leo=True  # Adjust this filter based on your model's field for active status
+                Nje_Ya_Mkata_Leo=True,  # Adjust this filter based on your model's field for active status
+                JumlaYaDeni__gt=0
             ).count()
 
             # Serialize the queryset if needed
@@ -234,8 +235,11 @@ class CountAllWamemalizaHawajakopaTenaView(APIView):
         try:
             # Count all wateja
             wateja_wote = WatejaWote.objects.filter(
-                JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
-                Nje_Ya_Mkata_Wote=True,
+                JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,   
+
+                Nje_Ya_Mkata_Wote=False,
+                Ni_Mteja_Hai=False,
+                Wamemaliza_Hawajakopa_Tena=True,
                 JumlaYaDeni__lte=0
             ).count()
 
@@ -416,7 +420,7 @@ class RetrieveWatejaWoteView(APIView):
             serializer = AddWatejaWoteSerializer(post)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except WatejaWote.DoesNotExist:
-            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'Mteja huyo hayupo'}, status=status.HTTP_404_NOT_FOUND)
 
 
 # Update Post View
