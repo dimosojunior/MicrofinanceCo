@@ -62,7 +62,7 @@ class WatejaWoteAdmin(ImportExportModelAdmin):
         "JinaLaMzaminiWa1", "JinaLaMzaminiWa2", "EmailYaMteja", "Mahali", "MaelezoYaMteja",
         "KiasiAnachokopa", "KiasiAlicholipa", "RejeshoKwaSiku", "JumlaYaDeni", "Riba",
         "AmesajiliwaNa", "Amerejesha_Leo", "PichaYaMteja", "Ni_Mteja_Hai", "Nje_Ya_Mkata_Wote", 
-        "Nje_Ya_Mkata_Leo", "Wamemaliza_Hawajakopa_Tena", "Created", "Up_To"
+        "Nje_Ya_Mkata_Leo", "Wamemaliza_Hawajakopa_Tena","JumlaYaFainiZote", "Created", "Up_To"
     ]
 
     def save_model(self, request, obj, form, change):
@@ -102,6 +102,25 @@ class MarejeshoCopiesAdmin(ImportExportModelAdmin):
             obj.Created = now()  # Set `Created` if not already set
         obj.save()
 
+
+@admin.register(MarejeshoCopiesTwo)
+class MarejeshoCopiesTwoAdmin(ImportExportModelAdmin):
+    list_display = ["id","JinaKamiliLaMteja","SimuYaMteja","EmailYaMteja","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created"]
+    list_filter =["Created"]
+    search_fields = ["JinaKamiliLaMteja"]
+
+    fields = [
+        "JinaKamiliLaMteja", "JinaLaKituo", "SimuYaMteja", "reg_no", 
+        "EmailYaMteja", "Mahali",
+        "KiasiAnachokopa", "KiasiAlicholipa", "RejeshoKwaSiku", "JumlaYaDeni", "Riba",
+        "AmesajiliwaNa", "RejeshoLililoPokelewaLeo", "PichaYaMteja", "Ni_Mteja_Hai", "Up_To", 
+        "FainiKwaSiku", "Created"
+    ]
+
+    def save_model(self, request, obj, form, change):
+        if not obj.Created:
+            obj.Created = now()  # Set `Created` if not already set
+        obj.save()
 
 @admin.register(NjeYaMkatabaCopies)
 class NjeYaMkatabaCopiesAdmin(ImportExportModelAdmin):

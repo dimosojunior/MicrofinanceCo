@@ -204,6 +204,11 @@ class MarejeshoCopiesSerializer(serializers.ModelSerializer):
         model = MarejeshoCopies
         fields = '__all__'
 
+class MarejeshoCopiesTwoSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = MarejeshoCopiesTwo
+        fields = '__all__'
 
 class MalipoYaFainiCopiesSerializer(serializers.ModelSerializer):
     

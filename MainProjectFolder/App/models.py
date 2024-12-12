@@ -412,6 +412,37 @@ class MarejeshoCopies(models.Model):
         return f"{self.JinaKamiliLaMteja}"
 
 
+class MarejeshoCopiesTwo(models.Model):
+    reg_no = models.CharField(verbose_name="Namba Ya Mteja", max_length=100000, blank=True, null=True)
+
+    JinaKamiliLaMteja = models.CharField(verbose_name="Jina Kamili La Mteja", max_length=500, blank=True, null=True)
+    JinaLaKituo = models.CharField(verbose_name="Jina La Kituo Cha Mteja", max_length=500, blank=True, null=True)
+    #JinaLaKituo = models.ForeignKey(VituoVyote, on_delete=models.PROTECT, blank=True, null=True)
+    SimuYaMteja = models.IntegerField(verbose_name="Namba Ya Simu Ya Mteja", blank=True, null=True)
+    EmailYaMteja = models.EmailField(verbose_name="Email Ya Mteja", max_length=500, blank=True, null=True)
+    Mahali = models.CharField(verbose_name="Mahali Anapoishi", max_length=500, blank=True, null=True)
+    KiasiAnachokopa = models.IntegerField(verbose_name="Kiasi Anachokopa", blank=True, null=True, default=0)
+    KiasiAlicholipa = models.IntegerField(verbose_name="Kiasi Alicholipa", blank=True, null=True, default=0)
+    RejeshoKwaSiku = models.IntegerField(verbose_name="Rejesho Kwa Siku", blank=True, null=True, default=0)
+    JumlaYaDeni = models.IntegerField(verbose_name="Jumla Ya Deni Analodaiwa", blank=True, null=True, default=0)
+    Riba = models.IntegerField(verbose_name="Riba", blank=True, null=True, default=0)
+    RejeshoLililoPokelewaLeo = models.IntegerField(verbose_name="Rejesho Lililo Pokelewa Leo", blank=True, null=True, default=0)
+    FainiKwaSiku = models.IntegerField(verbose_name="Faini Kwa Siku", blank=True, null=True, default=0)
+
+    AmesajiliwaNa = models.CharField(verbose_name="Amesajiliwa Na ?", max_length=500, blank=True, null=True)
+    PichaYaMteja = models.ImageField(verbose_name="Picha Ya Mteja", upload_to='media/PichaZaVyakula/', blank=True, null=True)
+    Ni_Mteja_Hai = models.BooleanField(default=True, blank=True, null=True)
+    Created = models.DateTimeField(default=now, blank=True, null=True)
+    Updated = models.DateTimeField(auto_now=True)
+    Up_To = models.DateTimeField(auto_now_add=False, blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Marejesho Copies Two"
+
+    def __str__(self):
+        return f"{self.JinaKamiliLaMteja}"
+
+
 class NjeYaMkatabaCopies(models.Model):
     reg_no = models.CharField(verbose_name="Namba Ya Mteja", max_length=100000, blank=True, null=True)
 

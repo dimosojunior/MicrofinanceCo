@@ -452,7 +452,7 @@ class UpdateWatejaWotePostView(APIView):
                 wateja = serializer.save()
 
                 print(f"Deleting MarejeshoCopies with reg_no={wateja.reg_no}")
-                MarejeshoCopies.objects.filter(
+                MarejeshoCopiesTwo.objects.filter(
                     #JinaKamiliLaMteja=wateja.JinaKamiliLaMteja,
                     reg_no=wateja.reg_no
                 ).delete()
@@ -464,6 +464,8 @@ class UpdateWatejaWotePostView(APIView):
                 wateja.RejeshoKwaSiku = rejesho_kwa_siku
                 wateja.JumlaYaDeni = deni_plus_riba
                 wateja.Riba = riba_kwa_mkopo
+                wateja.KiasiAlicholipa = 0
+                wateja.JumlaYaFainiZote = 0
                 
 
 
@@ -792,6 +794,26 @@ class WatejaWoteCartView(APIView):
 
         # Copy Mteja details to MarejeshoCopies
         MarejeshoCopies.objects.create(
+            JinaKamiliLaMteja=Mteja.JinaKamiliLaMteja,
+            JinaLaKituo=Mteja.JinaLaKituo.JinaLaKituo,
+            SimuYaMteja=Mteja.SimuYaMteja,
+            EmailYaMteja=Mteja.EmailYaMteja,
+            Mahali=Mteja.Mahali,
+            KiasiAnachokopa=Mteja.KiasiAnachokopa,
+            KiasiAlicholipa=Mteja.KiasiAlicholipa,
+            RejeshoKwaSiku=Mteja.RejeshoKwaSiku,
+            JumlaYaDeni=Mteja.JumlaYaDeni,
+            Riba=Mteja.Riba,
+            AmesajiliwaNa=Mteja.AmesajiliwaNa,
+            PichaYaMteja=Mteja.PichaYaMteja,
+            Ni_Mteja_Hai=Mteja.Ni_Mteja_Hai,
+            Up_To=Mteja.Up_To,
+            reg_no=Mteja.reg_no,
+            RejeshoLililoPokelewaLeo=KiasiChaRejeshoChaSiku
+        )
+
+
+        MarejeshoCopiesTwo.objects.create(
             JinaKamiliLaMteja=Mteja.JinaKamiliLaMteja,
             JinaLaKituo=Mteja.JinaLaKituo.JinaLaKituo,
             SimuYaMteja=Mteja.SimuYaMteja,
@@ -1219,7 +1241,7 @@ class GetWatejaNjeYaMkatabaWoteView(APIView):
             # Filter entries for today
             #today = now().date()
             queryset = WatejaWote.objects.filter(
-                JinaLaKituo__icontains=login_user_JinaLaKituo,
+                JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
                 Nje_Ya_Mkata_Wote=True,
                 JumlaYaDeni__gt=0
                 #Created__date=today
@@ -1267,7 +1289,7 @@ class GetWamemalizaHawajakopaTenaView(APIView):
             # Filter entries for today
             #today = now().date()
             queryset = WatejaWote.objects.filter(
-                JinaLaKituo__icontains=login_user_JinaLaKituo,
+                JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
                 Nje_Ya_Mkata_Wote=False,
                 Ni_Mteja_Hai=False,
                 Wamemaliza_Hawajakopa_Tena=True,
@@ -1562,6 +1584,7 @@ class AddRipotiView(APIView):
                 Amerejesha_Leo=False,
                 Nje_Ya_Mkata_Wote=False
             )
+
             for mteja in mteja_hai:
                 if not MarejeshoCopies.objects.filter(
                     JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
@@ -1571,6 +1594,32 @@ class AddRipotiView(APIView):
                     mteja.JumlaYaFainiZote = (mteja.JumlaYaFainiZote or 0) + 1000
                     mteja.save()
                     MarejeshoCopies.objects.create(
+                        JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+                        JinaLaKituo=mteja.JinaLaKituo.JinaLaKituo,
+                        SimuYaMteja=mteja.SimuYaMteja,
+                        EmailYaMteja=mteja.EmailYaMteja,
+                        Mahali=mteja.Mahali,
+                        KiasiAnachokopa=mteja.KiasiAnachokopa,
+                        KiasiAlicholipa=mteja.KiasiAlicholipa,
+                        RejeshoKwaSiku=mteja.RejeshoKwaSiku,
+                        JumlaYaDeni=mteja.JumlaYaDeni,
+                        Riba=mteja.Riba,
+                        AmesajiliwaNa=mteja.AmesajiliwaNa,
+                        PichaYaMteja=mteja.PichaYaMteja,
+                        Ni_Mteja_Hai=mteja.Ni_Mteja_Hai,
+                        Up_To=mteja.Up_To,
+                        reg_no=mteja.reg_no,
+                        FainiKwaSiku=1000
+                    )
+
+                if not MarejeshoCopiesTwo.objects.filter(
+                    JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+                    reg_no=mteja.reg_no, 
+                    Created__date=today
+                ).exists():
+                    # mteja.JumlaYaFainiZote = (mteja.JumlaYaFainiZote or 0) + 1000
+                    # mteja.save()
+                    MarejeshoCopiesTwo.objects.create(
                         JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
                         JinaLaKituo=mteja.JinaLaKituo.JinaLaKituo,
                         SimuYaMteja=mteja.SimuYaMteja,
@@ -1791,7 +1840,7 @@ class GetMarejeshoYoteYaMtejaView(APIView):
 
             # Filter entries for today
             today = now().date()
-            queryset = MarejeshoCopies.objects.filter(
+            queryset = MarejeshoCopiesTwo.objects.filter(
                 JinaLaKituo__icontains=login_user_JinaLaKituo,
                 JinaKamiliLaMteja__icontains=JinaKamiliLaMteja,
                 reg_no__icontains=reg_no
@@ -1807,7 +1856,7 @@ class GetMarejeshoYoteYaMtejaView(APIView):
             paginator.page_size = page_size
             page_items = paginator.paginate_queryset(queryset, request)
 
-            serializer = MarejeshoCopiesSerializer(page_items, many=True)
+            serializer = MarejeshoCopiesTwoSerializer(page_items, many=True)
 
             response_data = {
                 'queryset': serializer.data,
@@ -1840,6 +1889,9 @@ class DeleteRejeshoView(APIView):
     def delete(self, request, pk):
         #login_user_JinaLaKituo = request.user.JinaLaKituo.JinaLaKituo
         try:
+
+            today = now().date()
+            yesterday = today - timedelta(days=1)
             # Fetch the MarejeshoCopies instance
             marejesho = MarejeshoCopies.objects.get(id=pk)
 
@@ -1848,6 +1900,13 @@ class DeleteRejeshoView(APIView):
                 JinaKamiliLaMteja=marejesho.JinaKamiliLaMteja,
                 JinaLaKituo__JinaLaKituo__icontains=marejesho.JinaLaKituo
             )
+
+            # Delete matching entries from MarejeshoCopiesTwo
+            MarejeshoCopiesTwo.objects.filter(
+                JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+                reg_no=mteja.reg_no,
+                Created__date=today
+            ).delete()
 
             # Update JumlaYaDeni and KiasiAlicholipa in WatejaWote
             mteja.JumlaYaDeni += marejesho.RejeshoLililoPokelewaLeo
@@ -1929,7 +1988,7 @@ class GetWatejaNjeYaMkatabaLeoView(APIView):
             # Filter entries for today
             #today = now().date()
             queryset = WatejaWote.objects.filter(
-                JinaLaKituo__icontains=login_user_JinaLaKituo,
+                JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
                 Nje_Ya_Mkata_Leo=True
                 #Created__date=today
             ).order_by('JinaKamiliLaMteja')

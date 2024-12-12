@@ -1,4 +1,4 @@
-from App.models import WatejaWote, NjeYaMkatabaCopies
+from App.models import *
 from django.core.mail import send_mail
 from django.conf import settings
 
@@ -54,7 +54,7 @@ def run():
             if time_elapsed == 40 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
 
                 # Delete matching entries from MarejeshoCopies
-                MarejeshoCopies.objects.filter(
+                MarejeshoCopiesTwo.objects.filter(
                     JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
                     reg_no=mteja.reg_no
                 ).delete()
@@ -150,13 +150,6 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 
 
 
-# from App.models import WatejaWote, NjeYaMkatabaCopies
-# from django.core.mail import send_mail
-# from django.conf import settings
-
-# from datetime import datetime, timedelta
-# from django.utils.timezone import now
-
 # def run():
 #     try:
 #         today = now().date()
@@ -185,29 +178,38 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 #             #     mteja.save(update_fields=['Ni_Mteja_Hai'])
 #                 #send_email(mteja, "Ni Mteja Hai condition reached.")
 
-#             if time_elapsed == 1 and not mteja.Nje_Ya_Mkata_Leo and mteja.JumlaYaDeni > 0:
+#             if time_elapsed == 30 and not mteja.Nje_Ya_Mkata_Leo and mteja.JumlaYaDeni > 0:
 #                 mteja.Nje_Ya_Mkata_Leo = True
 #                 mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
 #                 send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako unaisha leo, deni lako limebaki Tsh {deni_plus_faini}/=\n Fika ofisini kumaliza deni lako kabla mfumo haujakubadilishia mkataba mpya. \n Mawasiliano: 0621690739 / 0747462389 ")
 #                 copy_to_nje_ya_mkataba_copies(mteja)
 
-#             if time_elapsed == 2 and mteja.Nje_Ya_Mkata_Leo:
+#             if time_elapsed == 31 and mteja.Nje_Ya_Mkata_Leo:
 #                 mteja.Nje_Ya_Mkata_Leo = False
 #                 mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
 #                 #send_email(mteja, "Umetoka nje ya mkataba wa siku 30.")
 
 #             #hii ni kwaajili ya kumchange mteja kuwa true kwenye mkatababa wote
-#             if time_elapsed == 2 and not mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+#             if time_elapsed == 31 and not mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
 #                 mteja.Nje_Ya_Mkata_Wote = True
 #                 mteja.save(update_fields=['Nje_Ya_Mkata_Wote'])
 #                 #send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_faini}/=, rejesha mpaka tarehe {tarehe_ya_kulipa_tena_nje_ya_mktaba_wote}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
             
 
-#             if time_elapsed == 3 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+#             if time_elapsed == 2 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+
+#                 # Delete matching entries from MarejeshoCopies
+#                 MarejeshoCopiesTwo.objects.filter(
+#                     JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+#                     reg_no=mteja.reg_no
+#                 ).delete()
+
+                
 #                 mteja.Nje_Ya_Mkata_Wote = False
 #                 mteja.Nje_Ya_Mkata_Leo = False
 #                 mteja.Ni_Mteja_Hai = True
 #                 mteja.Amerejesha_Leo = False
+#                 mteja.Wamemaliza_Hawajakopa_Tena = False
 
 #                 deni_alilomaliza_nalo = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
 
@@ -224,6 +226,10 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 #                 mteja.JumlaYaDeni = deni_plus_riba
 #                 mteja.KiasiAlicholipa = 0
 #                 mteja.RejeshoKwaSiku = rejesho_kwa_siku
+#                 mteja.JumlaYaFainiZote=0
+
+
+
 
 #                 mteja.Created = tarehe_ya_leo
 
@@ -243,6 +249,9 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 #                     'JumlaYaDeni',
 #                     'KiasiAlicholipa',
 #                     'RejeshoKwaSiku',
+#                     'JumlaYaFainiZote',
+#                     'Wamemaliza_Hawajakopa_Tena',
+
 #                     'Created',
 #                     'Up_To'
 #                 ])
@@ -278,3 +287,4 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 #         reg_no=mteja.reg_no,
 #         Up_To=mteja.Up_To,
 #     )
+
