@@ -1593,7 +1593,7 @@ class AddRipotiView(APIView):
         # Get BakiJana (Balance of yesterday's Ripoti)
         baki_jana_ripoti = Ripoti.objects.filter(
             Created__date=yesterday,
-            JinaLaKituo__icontains=login_user_JinaLaKituo
+            JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo
         ).first()
         baki_jana = baki_jana_ripoti.Balance if baki_jana_ripoti else 0
         data['BakiJana'] = int(baki_jana)
