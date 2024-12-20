@@ -53,7 +53,7 @@ class JumbeZaWatejaAdmin(ImportExportModelAdmin):
 
 @admin.register(WatejaWote)
 class WatejaWoteAdmin(ImportExportModelAdmin):
-    list_display = ["id","JinaKamiliLaMteja","reg_no","JinaLaKituo", "SimuYaMteja","time_left","Ni_Mteja_Hai","Nje_Ya_Mkata_Leo","Nje_Ya_Mkata_Wote","AinaZaMarejesho","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created", "Up_To"]
+    list_display = ["id","JinaKamiliLaMteja","reg_no","JinaLaKituo", "SimuYaMteja","time_left","Ni_Mteja_Hai","Nje_Ya_Mkata_Leo","Nje_Ya_Mkata_Wote","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created", "Up_To"]
     list_filter =["Created"]
     search_fields = ["JinaKamiliLaMteja"]
 
@@ -62,8 +62,8 @@ class WatejaWoteAdmin(ImportExportModelAdmin):
         "JinaLaMzaminiWa1", "JinaLaMzaminiWa2", "EmailYaMteja", "Mahali", "MaelezoYaMteja",
         "KiasiAnachokopa", "KiasiAlicholipa", "RejeshoKwaSiku", "JumlaYaDeni", "Riba",
         "AmesajiliwaNa", "Amerejesha_Leo", "PichaYaMteja", "Ni_Mteja_Hai", "Nje_Ya_Mkata_Wote", 
-        "Nje_Ya_Mkata_Leo", "Wamemaliza_Hawajakopa_Tena","JumlaYaFainiZote", "Created", "Up_To",
-        "AinaZaMarejesho"
+        "Nje_Ya_Mkata_Leo", "Wamemaliza_Hawajakopa_Tena","JumlaYaFainiZote", "Created", "Up_To"
+        #"AinaZaMarejesho"
     ]
 
     def save_model(self, request, obj, form, change):
