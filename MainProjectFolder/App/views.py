@@ -1638,11 +1638,13 @@ class AddRipotiView(APIView):
             #Copy Amerejesha_Leo = False to another model
             # Copy relevant records to MarejeshoCopies
             #ili mtu apigwe faini ni lazima hizo condition zote zifuatwe
+            #YULE ANAYERUDISHA BAADA YAMWEZI HATAKIWI KUPIGWA FAINI
             mteja_hai = WatejaWote.objects.filter(
                 JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
                 Ni_Mteja_Hai=True,
                 Amerejesha_Leo=False,
-                Nje_Ya_Mkata_Wote=False
+                Nje_Ya_Mkata_Wote=False,
+                AinaZaMarejesho__icontains="Kila Siku"
             )
 
             for mteja in mteja_hai:
@@ -1711,7 +1713,7 @@ class AddRipotiView(APIView):
             # Email notification to admin
             myemail = "juniordimoso8@gmail.com"
             subject = "Gegwajo Microfinance"
-            message = "Ripoti ya leo imewekwa kikamilifu"
+            message = f"Ripoti ya leo ya kituo cha {login_user_JinaLaKituo} imewekwa kikamilifu"
             from_email = settings.EMAIL_HOST_USER
             recipient_list = [myemail]
             send_mail(subject, message, from_email, recipient_list, fail_silently=True)
