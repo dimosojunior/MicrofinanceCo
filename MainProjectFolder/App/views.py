@@ -1643,8 +1643,8 @@ class AddRipotiView(APIView):
                 JinaLaKituo__JinaLaKituo__icontains=login_user_JinaLaKituo,
                 Ni_Mteja_Hai=True,
                 Amerejesha_Leo=False,
-                Nje_Ya_Mkata_Wote=False,
-                AinaZaMarejesho__icontains="Kila Siku"
+                Nje_Ya_Mkata_Wote=False
+               # AinaZaMarejesho__icontains="Kila Siku"
             )
 
             for mteja in mteja_hai:
