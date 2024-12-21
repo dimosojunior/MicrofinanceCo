@@ -10,6 +10,7 @@ router = DefaultRouter()
 
 router.register('AllMyUser', views.AllMyUserViewSet)
 router.register('AllVituoVyote', views.AllVituoVyoteViewSet)
+router.register('AllAinaZaMarejesho', views.AllAinaZaMarejeshoViewSet)
 
 
 

@@ -45,6 +45,12 @@ class VituoVyoteAdmin(ImportExportModelAdmin):
     list_filter =["Created"]
     search_fields = ["JinaLaKituo"]
 
+@admin.register(AinaZaMarejesho)  
+class AinaZaMarejeshoAdmin(ImportExportModelAdmin):
+    list_display = ["id","Aina","Created", "Updated"]
+    list_filter =["Created"]
+    search_fields = ["Aina"]
+
 @admin.register(JumbeZaWateja)  
 class JumbeZaWatejaAdmin(ImportExportModelAdmin):
     list_display = ["id","JinaKamiliLaMteja", "SimuYaMteja","Created", "Updated"]
@@ -53,12 +59,12 @@ class JumbeZaWatejaAdmin(ImportExportModelAdmin):
 
 @admin.register(WatejaWote)
 class WatejaWoteAdmin(ImportExportModelAdmin):
-    list_display = ["id","JinaKamiliLaMteja","reg_no","JinaLaKituo", "SimuYaMteja","time_left","Ni_Mteja_Hai","Nje_Ya_Mkata_Leo","Nje_Ya_Mkata_Wote","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created", "Up_To"]
+    list_display = ["id","JinaKamiliLaMteja","reg_no","JinaLaKituo","Aina", "SimuYaMteja","time_left","Ni_Mteja_Hai","Nje_Ya_Mkata_Leo","Nje_Ya_Mkata_Wote","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created", "Up_To"]
     list_filter =["Created"]
     search_fields = ["JinaKamiliLaMteja"]
 
     fields = [
-        "JinaKamiliLaMteja", "JinaLaKituo", "SimuYaMteja", "SimuYaMzaminiWa1", "SimuYaMzaminiWa2", 
+        "JinaKamiliLaMteja", "JinaLaKituo","Aina", "SimuYaMteja", "SimuYaMzaminiWa1", "SimuYaMzaminiWa2", 
         "JinaLaMzaminiWa1", "JinaLaMzaminiWa2", "EmailYaMteja", "Mahali", "MaelezoYaMteja",
         "KiasiAnachokopa", "KiasiAlicholipa", "RejeshoKwaSiku", "JumlaYaDeni", "Riba",
         "AmesajiliwaNa", "Amerejesha_Leo", "PichaYaMteja", "Ni_Mteja_Hai", "Nje_Ya_Mkata_Wote", 

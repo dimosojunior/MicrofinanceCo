@@ -355,11 +355,37 @@ class AddWatejaWoteView(APIView):
             return Response({"error": "KiasiAnachokopa is required"}, status=400)
 
         kiasi_anachokopa = int(kiasi_anachokopa)
-        riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
-        deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+        # riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
+        # deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
 
-        # Perform calculations
-        rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+        # # Perform calculations
+        # rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+
+        # Get the value of 'Aina' for the new mteja
+        aina_id = data.get('Aina', None)
+        aina_instance = None
+        if aina_id:
+            try:
+                aina_instance = AinaZaMarejesho.objects.get(id=aina_id)
+            except AinaZaMarejesho.DoesNotExist:
+                return Response({"error": "Invalid Aina ID"}, status=400)
+
+        # Perform calculations based on the 'Aina' value
+        if aina_instance and aina_instance.Aina == 'Muajiriwa':
+            riba_kwa_mkopo = int((kiasi_anachokopa * 30) / 100)
+            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+            rejesho_kwa_siku = 0
+
+        elif aina_instance and aina_instance.Aina == 'Mfanya Kazi Wa Kituo':
+            riba_kwa_mkopo = int((kiasi_anachokopa * 10) / 100)
+            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+            rejesho_kwa_siku = 0
+
+        else:
+            # Default calculations if 'Aina' is not specified or doesn't match the above cases
+            riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
+            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+            rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
         
         # Assign calculated fields to the data
         data['RejeshoKwaSiku'] = int(rejesho_kwa_siku)
@@ -398,19 +424,7 @@ class AddWatejaWoteView(APIView):
 
             print(f"Simu Ya Mteja {SimuYaMteja}")
 
-            # account_sid = os.getenv("TWILIO_ACCOUNT_SID")
-            # auth_token = os.getenv("TWILIO_AUTH_TOKEN")
-            # sender_number = os.getenv("TWILIO_SENDER_NUMBER")
-
             
-            # client = Client(account_sid, auth_token)
-            # message = client.messages \
-            #             .create(
-            #                 body=f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389.",
-            #                 from_= sender_number,
-            #                 #to='+255744973421'
-            #                 to =f"+255{SimuYaMteja}"
-            #             )
 
             
 
@@ -470,11 +484,37 @@ class UpdateWatejaWotePostView(APIView):
                 return Response({"error": "KiasiAnachokopa is required"}, status=400)
 
             kiasi_anachokopa = int(kiasi_anachokopa)
-            riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
-            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+            # riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
+            # deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
 
-            # Perform calculations
-            rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+            # # Perform calculations
+            # rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+
+            # Get the value of 'Aina' for the new mteja
+            aina_id = data.get('Aina', None)
+            aina_instance = None
+            if aina_id:
+                try:
+                    aina_instance = AinaZaMarejesho.objects.get(id=aina_id)
+                except AinaZaMarejesho.DoesNotExist:
+                    return Response({"error": "Invalid Aina ID"}, status=400)
+
+            # Perform calculations based on the 'Aina' value
+            if aina_instance and aina_instance.Aina == 'Muajiriwa':
+                riba_kwa_mkopo = int((kiasi_anachokopa * 30) / 100)
+                deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+                rejesho_kwa_siku = 0
+
+            elif aina_instance and aina_instance.Aina == 'Mfanya Kazi Wa Kituo':
+                riba_kwa_mkopo = int((kiasi_anachokopa * 10) / 100)
+                deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+                rejesho_kwa_siku = 0
+
+            else:
+                # Default calculations if 'Aina' is not specified or doesn't match the above cases
+                riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
+                deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+                rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
             
             # Assign calculated fields to the data
             data['RejeshoKwaSiku'] = int(rejesho_kwa_siku)
@@ -1648,7 +1688,7 @@ class AddRipotiView(APIView):
                 Amerejesha_Leo=False,
                 Nje_Ya_Mkata_Wote=False
                # AinaZaMarejesho__icontains="Kila Siku"
-            )
+            ).exclude(Aina__Aina__in=["Muajiriwa", "Mfanya kazi Wa Kituo"])
 
             for mteja in mteja_hai:
                 if not MarejeshoCopies.objects.filter(

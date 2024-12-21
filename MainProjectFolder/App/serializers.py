@@ -40,6 +40,13 @@ class VituoVyoteSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class AinaZaMarejeshoSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = AinaZaMarejesho
+        fields = '__all__'
+
+
 
 class OTPSerializer(serializers.Serializer):
     email = serializers.EmailField()

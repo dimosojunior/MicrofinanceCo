@@ -117,6 +117,14 @@ class AllVituoVyoteViewSet(ModelViewSet):
     serializer_class = VituoVyoteSerializer
 
 
+class AllAinaZaMarejeshoViewSet(ModelViewSet):
+    queryset = AinaZaMarejesho.objects.all(
+            # is_admin=False,
+            # is_customer=True
+        )
+    serializer_class = AinaZaMarejeshoSerializer
+
+
 
 
 

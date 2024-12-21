@@ -52,6 +52,21 @@ class VituoVyote(models.Model):
 
 
 
+class AinaZaMarejesho(models.Model):
+    
+    Aina = models.CharField(verbose_name="Aina Ya Mpokeaji",max_length=500, blank=True,null=True)
+    
+    Created = models.DateTimeField(auto_now_add=True)
+    Updated = models.DateTimeField(auto_now=True)
+    
+    def __str__(self):
+        return f"{self.Aina}"
+    
+    class Meta:
+        verbose_name_plural = "Aina Za Marejesho"
+
+
+
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, username,phone,Location, is_admin,is_staff,is_cashier,JinaLaKituo=None, password=None):
@@ -205,7 +220,8 @@ class OTP(models.Model):
 class WatejaWote(models.Model):
     reg_no= models.CharField(max_length=100000, default=generated_reg_no, unique=True, editable=False,blank=True,null=True)
     
-    
+    Aina = models.ForeignKey(AinaZaMarejesho,verbose_name="Aina Ya Mpokeaji", on_delete=models.PROTECT, blank=True,null=True) 
+
     JinaKamiliLaMteja = models.CharField(verbose_name="Jina Kamili La Mteja", max_length=500,blank=True,null=True)
     JinaLaKituo = models.ForeignKey(VituoVyote, on_delete=models.PROTECT, blank=True,null=True) 
 
@@ -245,6 +261,13 @@ class WatejaWote(models.Model):
 
     Created = models.DateTimeField(default=now, blank=True, null=True)
     Updated = models.DateTimeField(auto_now=True)
+
+    # AinaZaMarejesho_Choices = (
+    #         ('Kila Siku', 'Kila Siku'),
+    #         ('Baada Ya Mwezi', 'Baada Ya Mwezi'),
+
+    #     )
+    # AinaZaMarejesho = models.CharField(choices=AinaZaMarejesho_Choices, verbose_name="Aina Za Marejesho",max_length=500, blank=True,null=True)
 
     time_left = models.IntegerField(blank=True, null=True)
     is_red = models.BooleanField(default=False)
