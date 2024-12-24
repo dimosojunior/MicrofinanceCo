@@ -1689,7 +1689,7 @@ class AddRipotiView(APIView):
                 Amerejesha_Leo=False,
                 Nje_Ya_Mkata_Wote=False
                # AinaZaMarejesho__icontains="Kila Siku"
-            ).exclude(Aina__Aina__in=["Muajiriwa", "Mfanya kazi Wa Kituo"])
+            ).exclude(Aina__Aina__in=["Muajiriwa", "Mfanya Kazi Wa Kituo"])
 
             for mteja in mteja_hai:
                 if not MarejeshoCopies.objects.filter(
