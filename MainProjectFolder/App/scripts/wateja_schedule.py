@@ -53,7 +53,8 @@ def run():
 
             if time_elapsed == 40 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
 
-                # Delete matching entries from MarejeshoCopies
+                # Delete matching entries from MarejeshoCopiesTwo ili marejesho yake yaanze
+                #kusoma upya
                 MarejeshoCopiesTwo.objects.filter(
                     JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
                     reg_no=mteja.reg_no
@@ -70,9 +71,26 @@ def run():
 
                 kiasi_anachokopa = int(deni_alilomaliza_nalo)
 
-                riba_mpya = int((kiasi_anachokopa * 20) / 100)
-                deni_plus_riba = kiasi_anachokopa + riba_mpya
-                rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+                #Filter kulingana na category za wateja
+                if mteja.Aina.Aina == "Muajiriwa":
+                    riba_mpya = int((kiasi_anachokopa * 30) / 100)
+                    deni_plus_riba = kiasi_anachokopa + riba_mpya
+                    rejesho_kwa_siku = 0
+
+                elif mteja.Aina.Aina == "Mfanya Kazi Wa Kituo":
+                    riba_mpya = int((kiasi_anachokopa * 10) / 100)
+                    deni_plus_riba = kiasi_anachokopa + riba_mpya
+                    rejesho_kwa_siku = 0
+
+                else:
+                    riba_mpya = int((kiasi_anachokopa * 20) / 100)
+                    deni_plus_riba = kiasi_anachokopa + riba_mpya
+                    rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+
+
+
+
+
                 tarehe_ya_leo = now()
                 tarehe_ya_kumaliza = tarehe_ya_leo + timedelta(days=30)
 
@@ -118,7 +136,7 @@ def run():
 
 def send_email(mteja, condition_message):
     subject = "Notification: Condition Met"
-    message = f"Mteja: {mteja.JinaKamiliLaMteja}\nCondition: {condition_message}"
+    message = f"Jina La Mteja: {mteja.JinaKamiliLaMteja}\n Ujumbe: {condition_message}"
     from_email = settings.EMAIL_HOST_USER
     recipient_list = [mteja.EmailYaMteja]
     send_mail(subject, message, from_email, recipient_list, fail_silently=True)
@@ -149,6 +167,12 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 
 
 
+# from App.models import *
+# from django.core.mail import send_mail
+# from django.conf import settings
+
+# from datetime import datetime, timedelta
+# from django.utils.timezone import now
 
 # def run():
 #     try:
@@ -196,7 +220,7 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 #                 #send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_faini}/=, rejesha mpaka tarehe {tarehe_ya_kulipa_tena_nje_ya_mktaba_wote}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
             
 
-#             if time_elapsed == 2 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+#             if time_elapsed == 40 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
 
 #                 # Delete matching entries from MarejeshoCopies
 #                 MarejeshoCopiesTwo.objects.filter(
@@ -263,7 +287,7 @@ def copy_to_nje_ya_mkataba_copies(mteja):
 
 # def send_email(mteja, condition_message):
 #     subject = "Notification: Condition Met"
-#     message = f"Mteja: {mteja.JinaKamiliLaMteja}\nCondition: {condition_message}"
+#     message = f"Jina La Mteja: {mteja.JinaKamiliLaMteja}\n Ujumbe: {condition_message}"
 #     from_email = settings.EMAIL_HOST_USER
 #     recipient_list = [mteja.EmailYaMteja]
 #     send_mail(subject, message, from_email, recipient_list, fail_silently=True)
