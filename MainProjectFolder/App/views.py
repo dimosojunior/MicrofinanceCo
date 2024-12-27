@@ -881,6 +881,7 @@ class WatejaWoteCartView(APIView):
             Mteja.Ni_Mteja_Hai = False
             Mteja.Wamemaliza_Hawajakopa_Tena = True
             Mteja.Nje_Ya_Mkata_Wote=False
+            Mteja.Nje_Ya_Mkata_Leo = False
 
         # if Mteja.JumlaYaDeni <= 0 and Nje_Ya_Mkata_Wote == True :
         Mteja.save()

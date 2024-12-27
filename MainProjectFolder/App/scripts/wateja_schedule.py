@@ -72,12 +72,12 @@ def run():
                 kiasi_anachokopa = int(deni_alilomaliza_nalo)
 
                 #Filter kulingana na category za wateja
-                if mteja.Aina.Aina == "Muajiriwa":
+                if mteja.Aina and mteja.Aina.Aina == "Muajiriwa":
                     riba_mpya = int((kiasi_anachokopa * 30) / 100)
                     deni_plus_riba = kiasi_anachokopa + riba_mpya
                     rejesho_kwa_siku = 0
 
-                elif mteja.Aina.Aina == "Mfanya Kazi Wa Kituo":
+                elif mteja.Aina and mteja.Aina.Aina == "Mfanya Kazi Wa Kituo":
                     riba_mpya = int((kiasi_anachokopa * 10) / 100)
                     deni_plus_riba = kiasi_anachokopa + riba_mpya
                     rejesho_kwa_siku = 0
