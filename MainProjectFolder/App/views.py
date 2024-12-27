@@ -545,6 +545,7 @@ class UpdateWatejaWotePostView(APIView):
 
                 # Calculate and set `Up_To`
                 tarehe_ya_leo = now()
+                wateja.Created = tarehe_ya_leo
                 wateja.Up_To = tarehe_ya_leo + timedelta(days=30)
                 
                 wateja.KiasiAnachokopa = deni_plus_riba
