@@ -25,8 +25,8 @@ def run():
 
 
         for mteja in wateja_list:
-            time_elapsed = mteja.time_left
-            deni_plus_faini = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
+            time_elapsed = mteja.time_left or 0
+            deni_plus_faini = (mteja.JumlaYaDeni or 0) + (mteja.JumlaYaFainiZote or 0)
 
             # if time_elapsed == 31 and mteja.Ni_Mteja_Hai and mteja.JumlaYaDeni <= 0:
             #     mteja.Ni_Mteja_Hai = False
@@ -67,7 +67,7 @@ def run():
                 mteja.Amerejesha_Leo = False
                 mteja.Wamemaliza_Hawajakopa_Tena = False
 
-                deni_alilomaliza_nalo = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
+                deni_alilomaliza_nalo = (mteja.JumlaYaDeni or 0) + (mteja.JumlaYaFainiZote or 0)
 
                 kiasi_anachokopa = int(deni_alilomaliza_nalo)
 
@@ -132,7 +132,8 @@ def run():
             print(f"Executed: {mteja.JinaKamiliLaMteja}")
 
     except Exception as e:
-        print(f"Error occurred: {str(e)}")
+        print(f"Error occurred for {mteja.JinaKamiliLaMteja}: {str(e)}")
+        #print(f"Error occurred: {str(e)}")
 
 def send_email(mteja, condition_message):
     subject = "Notification: Condition Met"
