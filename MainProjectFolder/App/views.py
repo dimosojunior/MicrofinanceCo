@@ -544,7 +544,8 @@ class UpdateWatejaWotePostView(APIView):
                 ).delete()
 
                 # Calculate and set `Up_To`
-                wateja.Up_To = wateja.Created + timedelta(days=30)
+                tarehe_ya_leo = now()
+                wateja.Up_To = tarehe_ya_leo + timedelta(days=30)
                 
                 wateja.KiasiAnachokopa = deni_plus_riba
                 wateja.RejeshoKwaSiku = rejesho_kwa_siku
