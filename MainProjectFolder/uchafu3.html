@@ -1,112 +1,345 @@
-below are my django views for updating taarifa za wateja in WatejaWote model but after updating it i'm going to another model called MarejeshoCopies and i filtered all inofrmations with a reg_no similar to that of updated one and delete those informations, but the problem is the informations are not deleted please check where there is a problem, why it fails to delete informations in MarejeshoCopies model.
-my views.py codes are;
-class UpdateWatejaWotePostView(APIView):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+i'm using django and here i have a  script file that run automatically in my vps server for my wateja in WatejaWote model, but when i'm trying to run my script some of wateja is working correctly but some of wateja i'm getting this error '(venv) dimoso@vmi2331811:~/MicrofinanceCo/MainProjectFolder$ /home/dimoso/MicrofinanceCo/MainProjectFolder/venv/bin/python /home/dimoso/MicrofinanceCo/MainProjectFolder/manage.py runscript wateja_schedule
+/home/dimoso/MicrofinanceCo/MainProjectFolder/MyTemplatesApp
+Executed: DEVOTHA PHILIMON MWAMBOGELA
+Executed: 0BI DICKSON  JUMA
+Executed: ELEKIA DAMIAN MGAYA
+Executed: MWAJUMA MUSSA ATHUMAN
+Executed: ANETH MOSESI MPIGASIMU
+Executed: ANJELA JACKSON SILINJANJE
+Executed: OLIVA NYEMBO MPALWA
+Executed: FRORIDA LEONARD JOJO
+Executed: GIFTY MICHAEL MWASEMBE
+Executed: ANNA JOSEPHY MWAKATOBE
+Executed: JESKA MARTIN MUYINGA
+Executed: ENEZA JOELY MBWANJI
+Executed: YEKONIA RICHARD MWAMBAMBE
+Executed: ROSE WILLISON MWINZA
+Executed: MATHA GRESON MIDETHA
+Error occurred: unsupported operand type(s) for +: 'int' and 'NoneType'
+(venv) dimoso@vmi2331811:~/MicrofinanceCo/MainProjectFolder$', so i don't know where there is a problem.
+my script file codes;
+from App.models import *
+from django.core.mail import send_mail
+from django.conf import settings
 
-    def put(self, request, pk):
-        try:
-            post = WatejaWote.objects.get(
-                id=pk 
-                #username=request.user.username
-            )
+from datetime import datetime, timedelta
+from django.utils.timezone import now
+
+def run():
+    try:
+        today = now().date()
+        wateja_list = WatejaWote.objects.all()
+        deni_plus_faini = 0
+        tarehe_ya_kulipa_tena_nje_ya_mkataba_wote = 0
+        tarehe_ya_leo = 0
+        tarehe_ya_kumaliza=0
+
+        deni_alilomaliza_nalo = 0
+
+        kiasi_anachokopa = 0
+
+        riba_mpya = 0
+        deni_plus_riba = 0
+        rejesho_kwa_siku = 0
+        
 
 
-            user = request.user
-            data = request.data.copy()
+        for mteja in wateja_list:
+            time_elapsed = mteja.time_left
+            deni_plus_faini = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
 
-            # Automatically fill in fields from the user
-            data['AmesajiliwaNa'] = user.username
+            # if time_elapsed == 31 and mteja.Ni_Mteja_Hai and mteja.JumlaYaDeni <= 0:
+            #     mteja.Ni_Mteja_Hai = False
+            #     mteja.save(update_fields=['Ni_Mteja_Hai'])
+                #send_email(mteja, "Ni Mteja Hai condition reached.")
 
-            # Ensure 'KiasiAnachokopa' is provided
-            kiasi_anachokopa = data.get('KiasiAnachokopa', None)
-            if not kiasi_anachokopa:
-                return Response({"error": "KiasiAnachokopa is required"}, status=400)
+            if time_elapsed == 30 and not mteja.Nje_Ya_Mkata_Leo and mteja.JumlaYaDeni > 0:
+                mteja.Nje_Ya_Mkata_Leo = True
+                mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
+                send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako unaisha leo, deni lako limebaki Tsh {deni_plus_faini}/=\n Fika ofisini kumaliza deni lako kabla mfumo haujakubadilishia mkataba mpya. \n Mawasiliano: 0621690739 / 0747462389 ")
+                copy_to_nje_ya_mkataba_copies(mteja)
 
-            kiasi_anachokopa = int(kiasi_anachokopa)
-            riba_kwa_mkopo = int((kiasi_anachokopa * 20) / 100)
-            deni_plus_riba = kiasi_anachokopa + riba_kwa_mkopo
+            if time_elapsed == 31 and mteja.Nje_Ya_Mkata_Leo:
+                mteja.Nje_Ya_Mkata_Leo = False
+                mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
+                #send_email(mteja, "Umetoka nje ya mkataba wa siku 30.")
 
-            # Perform calculations
-            rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+            #hii ni kwaajili ya kumchange mteja kuwa true kwenye mkatababa wote
+            if time_elapsed == 31 and not mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+                mteja.Nje_Ya_Mkata_Wote = True
+                mteja.save(update_fields=['Nje_Ya_Mkata_Wote'])
+                #send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_faini}/=, rejesha mpaka tarehe {tarehe_ya_kulipa_tena_nje_ya_mktaba_wote}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
             
-            # Assign calculated fields to the data
-            data['RejeshoKwaSiku'] = int(rejesho_kwa_siku)
-            data['JumlaYaDeni'] = deni_plus_riba
-            data['Riba'] = riba_kwa_mkopo
 
-            #data['KiasiAnachokopa'] = deni_plus_riba
+            if time_elapsed == 40 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
 
-            JinaKamiliLaMteja = data.get('JinaKamiliLaMteja', None)
-            EmailYaMteja = data.get('EmailYaMteja', None)
-            SimuYaMteja = data.get('SimuYaMteja', None)
-
-            serializer = AddWatejaWoteSerializer(post, 
-                data=request.data, 
-                partial=True
-            )
-
-            if serializer.is_valid():
-                #serializer.save()
-
-                wateja = serializer.save()
-
-                # Calculate and set `Up_To`
-                wateja.Up_To = wateja.Created + timedelta(days=30)
-                
-                wateja.KiasiAnachokopa = deni_plus_riba
-                wateja.RejeshoKwaSiku = rejesho_kwa_siku
-                wateja.JumlaYaDeni = deni_plus_riba
-                wateja.Riba = riba_kwa_mkopo
-                
-
-
-                wateja.Ni_Mteja_Hai = True
-
-                wateja.Amerejesha_Leo = False
-                wateja.Nje_Ya_Mkata_Wote = False
-                wateja.Nje_Ya_Mkata_Leo = False
-                wateja.Wamemaliza_Hawajakopa_Tena = False
-
-                wateja.save()
-
-
-                MarejeshoCopies.objects.filter(
-                    #JinaKamiliLaMteja=wateja.JinaKamiliLaMteja,
-                    reg_no=wateja.reg_no
+                # Delete matching entries from MarejeshoCopiesTwo ili marejesho yake yaanze
+                #kusoma upya
+                MarejeshoCopiesTwo.objects.filter(
+                    JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+                    reg_no=mteja.reg_no
                 ).delete()
 
-                #print("HELLLO TANZANIA")
+                
+                mteja.Nje_Ya_Mkata_Wote = False
+                mteja.Nje_Ya_Mkata_Leo = False
+                mteja.Ni_Mteja_Hai = True
+                mteja.Amerejesha_Leo = False
+                mteja.Wamemaliza_Hawajakopa_Tena = False
 
-                # Send SMS notification to the registered mteja
-                # phone_number = data.get('SimuYaMteja')
-                # message = f"Habari {wateja.JinaKamiliLaMteja}, umesajiliwa kikamilifu. Kiasi cha mkopo: {kiasi_anachokopa} TZS."
-                # sms_response = self.send_sms(phone_number, message)
+                deni_alilomaliza_nalo = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
+
+                kiasi_anachokopa = int(deni_alilomaliza_nalo)
+
+                #Filter kulingana na category za wateja
+                if mteja.Aina.Aina == "Muajiriwa":
+                    riba_mpya = int((kiasi_anachokopa * 30) / 100)
+                    deni_plus_riba = kiasi_anachokopa + riba_mpya
+                    rejesho_kwa_siku = 0
+
+                elif mteja.Aina.Aina == "Mfanya Kazi Wa Kituo":
+                    riba_mpya = int((kiasi_anachokopa * 10) / 100)
+                    deni_plus_riba = kiasi_anachokopa + riba_mpya
+                    rejesho_kwa_siku = 0
+
+                else:
+                    riba_mpya = int((kiasi_anachokopa * 20) / 100)
+                    deni_plus_riba = kiasi_anachokopa + riba_mpya
+                    rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+
+
+
+
+
+                tarehe_ya_leo = now()
+                tarehe_ya_kumaliza = tarehe_ya_leo + timedelta(days=30)
+
+                mteja.KiasiAnachokopa = deni_plus_riba
+                mteja.Riba = riba_mpya
+                mteja.JumlaYaDeni = deni_plus_riba
+                mteja.KiasiAlicholipa = 0
+                mteja.RejeshoKwaSiku = rejesho_kwa_siku
+                mteja.JumlaYaFainiZote=0
+
+
+
+
+                mteja.Created = tarehe_ya_leo
+
+                mteja.Up_To = tarehe_ya_kumaliza
 
                 
 
-                # Email notification to admin
-                myemail = "juniordimoso8@gmail.com"
-                subject = "GGJ - MKOPO"
-                message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
-                from_email = settings.EMAIL_HOST_USER
-                recipient_list = [EmailYaMteja]
-                send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+                #calculation
+
+                mteja.save(update_fields=[
+                    'Nje_Ya_Mkata_Wote',
+                    'Nje_Ya_Mkata_Leo',
+                    'Ni_Mteja_Hai',
+                    'Amerejesha_Leo',
+                    'KiasiAnachokopa',
+                    'Riba',
+                    'JumlaYaDeni',
+                    'KiasiAlicholipa',
+                    'RejeshoKwaSiku',
+                    'JumlaYaFainiZote',
+                    'Wamemaliza_Hawajakopa_Tena',
+
+                    'Created',
+                    'Up_To'
+                ])
+                send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
+            print(f"Executed: {mteja.JinaKamiliLaMteja}")
+
+    except Exception as e:
+        print(f"Error occurred: {str(e)}")
+
+def send_email(mteja, condition_message):
+    subject = "Notification: Condition Met"
+    message = f"Jina La Mteja: {mteja.JinaKamiliLaMteja}\n Ujumbe: {condition_message}"
+    from_email = settings.EMAIL_HOST_USER
+    recipient_list = [mteja.EmailYaMteja]
+    send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
+def copy_to_nje_ya_mkataba_copies(mteja):
+    NjeYaMkatabaCopies.objects.create(
+        JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+        JinaLaKituo=mteja.JinaLaKituo.JinaLaKituo,
+        SimuYaMteja=mteja.SimuYaMteja,
+        EmailYaMteja=mteja.EmailYaMteja,
+        Mahali=mteja.Mahali,
+        KiasiAnachokopa=mteja.KiasiAnachokopa,
+        KiasiAlicholipa=mteja.KiasiAlicholipa,
+        RejeshoKwaSiku=mteja.RejeshoKwaSiku,
+        JumlaYaDeni=mteja.JumlaYaDeni,
+        Riba=mteja.Riba,
+        AmesajiliwaNa=mteja.AmesajiliwaNa,
+        PichaYaMteja=mteja.PichaYaMteja,
+        Ni_Mteja_Hai=mteja.Ni_Mteja_Hai,
+        Updated=mteja.Updated,
+        reg_no=mteja.reg_no,
+        Up_To=mteja.Up_To,
+    )
 
 
 
-                return Response(serializer.data, status=status.HTTP_200_OK)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        except WatejaWote.DoesNotExist:
-            return Response({'error': 'Post not found'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
-my models are;
+
+# from App.models import *
+# from django.core.mail import send_mail
+# from django.conf import settings
+
+# from datetime import datetime, timedelta
+# from django.utils.timezone import now
+
+# def run():
+#     try:
+#         today = now().date()
+#         wateja_list = WatejaWote.objects.all()
+#         deni_plus_faini = 0
+#         tarehe_ya_kulipa_tena_nje_ya_mkataba_wote = 0
+#         tarehe_ya_leo = 0
+#         tarehe_ya_kumaliza=0
+
+#         deni_alilomaliza_nalo = 0
+
+#         kiasi_anachokopa = 0
+
+#         riba_mpya = 0
+#         deni_plus_riba = 0
+#         rejesho_kwa_siku = 0
+        
+
+
+#         for mteja in wateja_list:
+#             time_elapsed = mteja.time_left
+#             deni_plus_faini = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
+
+#             # if time_elapsed == 31 and mteja.Ni_Mteja_Hai and mteja.JumlaYaDeni <= 0:
+#             #     mteja.Ni_Mteja_Hai = False
+#             #     mteja.save(update_fields=['Ni_Mteja_Hai'])
+#                 #send_email(mteja, "Ni Mteja Hai condition reached.")
+
+#             if time_elapsed == 30 and not mteja.Nje_Ya_Mkata_Leo and mteja.JumlaYaDeni > 0:
+#                 mteja.Nje_Ya_Mkata_Leo = True
+#                 mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
+#                 send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako unaisha leo, deni lako limebaki Tsh {deni_plus_faini}/=\n Fika ofisini kumaliza deni lako kabla mfumo haujakubadilishia mkataba mpya. \n Mawasiliano: 0621690739 / 0747462389 ")
+#                 copy_to_nje_ya_mkataba_copies(mteja)
+
+#             if time_elapsed == 31 and mteja.Nje_Ya_Mkata_Leo:
+#                 mteja.Nje_Ya_Mkata_Leo = False
+#                 mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
+#                 #send_email(mteja, "Umetoka nje ya mkataba wa siku 30.")
+
+#             #hii ni kwaajili ya kumchange mteja kuwa true kwenye mkatababa wote
+#             if time_elapsed == 31 and not mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+#                 mteja.Nje_Ya_Mkata_Wote = True
+#                 mteja.save(update_fields=['Nje_Ya_Mkata_Wote'])
+#                 #send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_faini}/=, rejesha mpaka tarehe {tarehe_ya_kulipa_tena_nje_ya_mktaba_wote}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
+            
+
+#             if time_elapsed == 40 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
+
+#                 # Delete matching entries from MarejeshoCopies
+#                 MarejeshoCopiesTwo.objects.filter(
+#                     JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+#                     reg_no=mteja.reg_no
+#                 ).delete()
+
+                
+#                 mteja.Nje_Ya_Mkata_Wote = False
+#                 mteja.Nje_Ya_Mkata_Leo = False
+#                 mteja.Ni_Mteja_Hai = True
+#                 mteja.Amerejesha_Leo = False
+#                 mteja.Wamemaliza_Hawajakopa_Tena = False
+
+#                 deni_alilomaliza_nalo = mteja.JumlaYaDeni + mteja.JumlaYaFainiZote
+
+#                 kiasi_anachokopa = int(deni_alilomaliza_nalo)
+
+#                 riba_mpya = int((kiasi_anachokopa * 20) / 100)
+#                 deni_plus_riba = kiasi_anachokopa + riba_mpya
+#                 rejesho_kwa_siku = round((deni_plus_riba) / 30, 0)
+#                 tarehe_ya_leo = now()
+#                 tarehe_ya_kumaliza = tarehe_ya_leo + timedelta(days=30)
+
+#                 mteja.KiasiAnachokopa = deni_plus_riba
+#                 mteja.Riba = riba_mpya
+#                 mteja.JumlaYaDeni = deni_plus_riba
+#                 mteja.KiasiAlicholipa = 0
+#                 mteja.RejeshoKwaSiku = rejesho_kwa_siku
+#                 mteja.JumlaYaFainiZote=0
+
+
+
+
+#                 mteja.Created = tarehe_ya_leo
+
+#                 mteja.Up_To = tarehe_ya_kumaliza
+
+                
+
+#                 #calculation
+
+#                 mteja.save(update_fields=[
+#                     'Nje_Ya_Mkata_Wote',
+#                     'Nje_Ya_Mkata_Leo',
+#                     'Ni_Mteja_Hai',
+#                     'Amerejesha_Leo',
+#                     'KiasiAnachokopa',
+#                     'Riba',
+#                     'JumlaYaDeni',
+#                     'KiasiAlicholipa',
+#                     'RejeshoKwaSiku',
+#                     'JumlaYaFainiZote',
+#                     'Wamemaliza_Hawajakopa_Tena',
+
+#                     'Created',
+#                     'Up_To'
+#                 ])
+#                 send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
+#             print(f"Executed: {mteja.JinaKamiliLaMteja}")
+
+#     except Exception as e:
+#         print(f"Error occurred: {str(e)}")
+
+# def send_email(mteja, condition_message):
+#     subject = "Notification: Condition Met"
+#     message = f"Jina La Mteja: {mteja.JinaKamiliLaMteja}\n Ujumbe: {condition_message}"
+#     from_email = settings.EMAIL_HOST_USER
+#     recipient_list = [mteja.EmailYaMteja]
+#     send_mail(subject, message, from_email, recipient_list, fail_silently=True)
+
+# def copy_to_nje_ya_mkataba_copies(mteja):
+#     NjeYaMkatabaCopies.objects.create(
+#         JinaKamiliLaMteja=mteja.JinaKamiliLaMteja,
+#         JinaLaKituo=mteja.JinaLaKituo.JinaLaKituo,
+#         SimuYaMteja=mteja.SimuYaMteja,
+#         EmailYaMteja=mteja.EmailYaMteja,
+#         Mahali=mteja.Mahali,
+#         KiasiAnachokopa=mteja.KiasiAnachokopa,
+#         KiasiAlicholipa=mteja.KiasiAlicholipa,
+#         RejeshoKwaSiku=mteja.RejeshoKwaSiku,
+#         JumlaYaDeni=mteja.JumlaYaDeni,
+#         Riba=mteja.Riba,
+#         AmesajiliwaNa=mteja.AmesajiliwaNa,
+#         PichaYaMteja=mteja.PichaYaMteja,
+#         Ni_Mteja_Hai=mteja.Ni_Mteja_Hai,
+#         Updated=mteja.Updated,
+#         reg_no=mteja.reg_no,
+#         Up_To=mteja.Up_To,
+#     )
+
+
+my models.py codes are;
+
 class WatejaWote(models.Model):
     reg_no= models.CharField(max_length=100000, default=generated_reg_no, unique=True, editable=False,blank=True,null=True)
     
-    
+    Aina = models.ForeignKey(AinaZaMarejesho,verbose_name="Aina Ya Mpokeaji", on_delete=models.PROTECT, blank=True,null=True) 
+
     JinaKamiliLaMteja = models.CharField(verbose_name="Jina Kamili La Mteja", max_length=500,blank=True,null=True)
     JinaLaKituo = models.ForeignKey(VituoVyote, on_delete=models.PROTECT, blank=True,null=True) 
 
@@ -147,6 +380,13 @@ class WatejaWote(models.Model):
     Created = models.DateTimeField(default=now, blank=True, null=True)
     Updated = models.DateTimeField(auto_now=True)
 
+    # AinaZaMarejesho_Choices = (
+    #         ('Kila Siku', 'Kila Siku'),
+    #         ('Baada Ya Mwezi', 'Baada Ya Mwezi'),
+
+    #     )
+    # AinaZaMarejesho = models.CharField(choices=AinaZaMarejesho_Choices, verbose_name="Aina Za Marejesho",max_length=500, blank=True,null=True)
+
     time_left = models.IntegerField(blank=True, null=True)
     is_red = models.BooleanField(default=False)
 
@@ -160,7 +400,7 @@ class WatejaWote(models.Model):
         return f" {self.JinaKamiliLaMteja} "
 
 
-class MarejeshoCopies(models.Model):
+class NjeYaMkatabaCopies(models.Model):
     reg_no = models.CharField(verbose_name="Namba Ya Mteja", max_length=100000, blank=True, null=True)
 
     JinaKamiliLaMteja = models.CharField(verbose_name="Jina Kamili La Mteja", max_length=500, blank=True, null=True)
@@ -185,7 +425,7 @@ class MarejeshoCopies(models.Model):
     Up_To = models.DateTimeField(auto_now_add=False, blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Marejesho Copies"
+        verbose_name_plural = "Nje Ya Mkataba Copies"
 
     def __str__(self):
         return f"{self.JinaKamiliLaMteja}"

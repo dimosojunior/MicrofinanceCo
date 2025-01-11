@@ -59,7 +59,7 @@ class JumbeZaWatejaAdmin(ImportExportModelAdmin):
 
 @admin.register(WatejaWote)
 class WatejaWoteAdmin(ImportExportModelAdmin):
-    list_display = ["id","JinaKamiliLaMteja","reg_no","JinaLaKituo","Aina", "SimuYaMteja","time_left","Ni_Mteja_Hai","Nje_Ya_Mkata_Leo","Nje_Ya_Mkata_Wote","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created", "Up_To"]
+    list_display = ["id","JinaKamiliLaMteja","reg_no","time_left","JinaLaKituo","Aina", "SimuYaMteja","Ni_Mteja_Hai","Nje_Ya_Mkata_Leo","Nje_Ya_Mkata_Wote","Mahali","KiasiAnachokopa","JumlaYaDeni","RejeshoKwaSiku", "Created", "Up_To"]
     list_filter =["Created"]
     search_fields = ["JinaKamiliLaMteja"]
 

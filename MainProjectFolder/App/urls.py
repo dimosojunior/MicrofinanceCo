@@ -5,6 +5,11 @@ from . import views
 
 urlpatterns = [
 
+    path('SendSMSNextSMSView/', views.SendSMSNextSMSView.as_view(), name='SendSMSNextSMSView'),
+    path('SendSMSBeemView/', views.SendSMSBeemView.as_view(), name='SendSMSBeemView'),
+    
+
+
     
     path('change-password/', views.ChangePasswordView.as_view(), name='change-password'),
 

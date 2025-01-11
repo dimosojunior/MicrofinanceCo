@@ -28,85 +28,45 @@ load_dotenv()
 
 
 
-# def send_sms(phone_number, message):
-#     """
-#     Sends an SMS using Beem Africa API.
+def send_sms(phone_number, message):
+    """
+    Sends an SMS using Beem Africa API.
     
-#     :param phone_number: The recipient's phone number in international format (e.g., +255XXXXXXXXX)
-#     :param message: The message to send
-#     """
-#     url = os.getenv("BEEM_ACCOUNT_URL")
-#     api_key = os.getenv("BEEM_ACCOUNT_API_KEY")  # Replace with your Beem Africa API key
-#     secret_key = os.getenv("BEEM_ACCOUNT_SECRET_KEY")  # Replace with your Beem Africa secret key
-#     sender_id = os.getenv("BEEM_ACCOUNT_SENDER_ID")  # Replace with your approved Sender Name
+    :param phone_number: The recipient's phone number in international format (e.g., +255XXXXXXXXX)
+    :param message: The message to send
+    """
+    url = os.getenv("BEEM_ACCOUNT_URL")
+    api_key = os.getenv("BEEM_ACCOUNT_API_KEY")  # Replace with your Beem Africa API key
+    secret_key = os.getenv("BEEM_ACCOUNT_SECRET_KEY")  # Replace with your Beem Africa secret key
+    sender_id = os.getenv("BEEM_ACCOUNT_SENDER_ID")  # Replace with your approved Sender Name
 
-#     # Encode API key and secret key in base64
-#     auth_string = f"{api_key}:{secret_key}"
-#     auth_bytes = auth_string.encode("utf-8")
-#     auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
-
-#     headers = {
-#         "Content-Type": "application/json",
-#         "Authorization": f"Basic {auth_base64}"
-#     }
-    
-#     payload = {
-#         "source_addr": sender_id,
-#         "encoding": 0,
-#         "schedule_time": "",
-#         "recipients": [{"recipient_id": 1, "dest_addr": phone_number}],
-#         "message": message
-#     }
-
-#     try:
-#         response = requests.post(url, json=payload, headers=headers)
-#         response.raise_for_status()  # Raise an error for HTTP codes 4XX/5XX
-#         return response.json()
-#     except requests.exceptions.RequestException as e:
-#         print(f"Error sending SMS: {e}")
-#         return None
-
-
-
-
-def send_sms_nextsms(phone_number, message):
-    url = "https://messaging-service.co.tz/api/sms/v1/text/single"  # Test endpoint
-    username = "dimoso"  # Replace with your actual username
-    password = "Dimoso@9898"  # Replace with your actual password
-    
-    # Construct the Base64 authorization header
-    auth_string = f"{username}:{password}"
-    auth_header = f"Basic {base64.b64encode(auth_string.encode('utf-8')).decode('utf-8')}"
+    # Encode API key and secret key in base64
+    auth_string = f"{api_key}:{secret_key}"
+    auth_bytes = auth_string.encode("utf-8")
+    auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
 
     headers = {
         "Content-Type": "application/json",
-        "Accept": "application/json",
-        "Authorization": auth_header,
+        "Authorization": f"Basic {auth_base64}"
     }
-
+    
     payload = {
-        "from": "GGJ MKOPO",  # Replace with your approved sender ID
-        "to": phone_number,  # Single phone number as a string
-        "text": message,  # Message text
-        "reference": "your-reference"  # Optional: Add a unique reference
+        "source_addr": sender_id,
+        "encoding": 0,
+        "schedule_time": "",
+        "recipients": [{"recipient_id": 1, "dest_addr": phone_number}],
+        "message": message
     }
 
     try:
-        # Make the POST request
         response = requests.post(url, json=payload, headers=headers)
-        
-        # Debugging: Print response details
-        print(f"Status Code: {response.status_code}")
-        print(f"Response Content: {response.text}")
-        
-        # Raise an exception for HTTP errors
-        response.raise_for_status()
-        
-        # Parse and return JSON response
+        response.raise_for_status()  # Raise an error for HTTP codes 4XX/5XX
         return response.json()
     except requests.exceptions.RequestException as e:
-        print(f"Error sending SMS via NextSMS: {e}")
+        print(f"Error sending SMS: {e}")
         return None
+
+
 
 
 def run():
@@ -125,18 +85,10 @@ def run():
         riba_mpya = 0
         deni_plus_riba = 0
         rejesho_kwa_siku = 0
-
-        total_checked = 0
-        condition_checked = {
-            "30_days_left": 0,
-            "31_days_left": 0,
-            "40_days_left": 0
-        }
         
 
 
         for mteja in wateja_list:
-            total_checked += 1
             time_elapsed = mteja.time_left or 0
             deni_plus_faini = (mteja.JumlaYaDeni or 0) + (mteja.JumlaYaFainiZote or 0)
 
@@ -146,7 +98,6 @@ def run():
                 #send_email(mteja, "Ni Mteja Hai condition reached.")
 
             if time_elapsed == 30 and not mteja.Nje_Ya_Mkata_Leo and mteja.JumlaYaDeni > 0:
-                condition_checked["30_days_left"] += 1
                 mteja.Nje_Ya_Mkata_Leo = True
                 mteja.save(update_fields=['Nje_Ya_Mkata_Leo'])
                 send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako unaisha leo, deni lako limebaki Tsh {deni_plus_faini}/=\n Fika ofisini kumaliza deni lako kabla mfumo haujakubadilishia mkataba mpya. \n Mawasiliano: 0621690739 / 0747462389 ")
@@ -155,13 +106,13 @@ def run():
                 # Sending SMS after registration
                 message = f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako unaisha leo, deni lako limebaki Tsh {deni_plus_faini}/=\n Fika ofisini kumaliza deni lako kabla mfumo haujakubadilishia mkataba mpya. \n Mawasiliano: 0621690739 / 0747462389"
                 phone_number = f"255{mteja.SimuYaMteja}"
-                sms_response = send_sms_nextsms(phone_number, message)
+                sms_response = send_sms(phone_number, message)
                 
                 
                 if sms_response:
-                    print (f"SMS sent successfully to {mteja.JinaKamiliLaMteja}")
+                    return JsonResponse({"message": "SMS sent successfully!"}, status=201)
                 else:
-                    continue
+                    return JsonResponse({"error": "failed to send SMS."}, status=500)
 
                 #Mwisho wa kutuma sms
 
@@ -172,14 +123,12 @@ def run():
 
             #hii ni kwaajili ya kumchange mteja kuwa true kwenye mkatababa wote
             if time_elapsed == 31 and not mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
-                condition_checked["31_days_left"] += 1
                 mteja.Nje_Ya_Mkata_Wote = True
                 mteja.save(update_fields=['Nje_Ya_Mkata_Wote'])
                 #send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_faini}/=, rejesha mpaka tarehe {tarehe_ya_kulipa_tena_nje_ya_mktaba_wote}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
             
 
             if time_elapsed == 40 and mteja.Nje_Ya_Mkata_Wote and mteja.JumlaYaDeni > 0:
-                condition_checked["40_days_left"] += 1
 
                 # Delete matching entries from MarejeshoCopiesTwo ili marejesho yake yaanze
                 #kusoma upya
@@ -262,21 +211,18 @@ def run():
                 # Sending SMS after registration
                 message = f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389"
                 phone_number = f"255{mteja.SimuYaMteja}"
-                sms_response = send_sms_nextsms(phone_number, message)
+                sms_response = send_sms(phone_number, message)
                 
                 
                 if sms_response:
-                    print (f"SMS sent successfully to {mteja.JinaKamiliLaMteja}")
+                    return JsonResponse({"message": "SMS sent successfully!"}, status=201)
                 else:
-                    continue
-                
+                    return JsonResponse({"error": "failed to send SMS."}, status=500)
 
                 #Mwisho wa kutuma sms
             
 
-        # print(f"Total wateja checked: {total_checked}")
-        # for condition, count in condition_checked.items():
-        #     print(f"Condition '{condition}': {count} wateja checked.")
+
 
             print(f"Executed: {mteja.JinaKamiliLaMteja}")
 

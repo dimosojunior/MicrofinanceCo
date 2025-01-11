@@ -1,6 +1,6 @@
 
 
-
+from django.views import View
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -117,8 +117,182 @@ from twilio.rest import Client
 from dotenv import load_dotenv
 import os
 
+import requests
+
+import base64
+import requests
+
 # Load environment variables
 load_dotenv()
+
+
+
+
+def send_sms(phone_number, message):
+    """
+    Sends an SMS using Beem Africa API.
+    
+    :param phone_number: The recipient's phone number in international format (e.g., +255XXXXXXXXX)
+    :param message: The message to send
+    """
+    url = os.getenv("BEEM_ACCOUNT_URL")
+    api_key = os.getenv("BEEM_ACCOUNT_API_KEY")  # Replace with your Beem Africa API key
+    secret_key = os.getenv("BEEM_ACCOUNT_SECRET_KEY")  # Replace with your Beem Africa secret key
+    sender_id = os.getenv("BEEM_ACCOUNT_SENDER_ID")  # Replace with your approved Sender Name
+
+    # Encode API key and secret key in base64
+    auth_string = f"{api_key}:{secret_key}"
+    auth_bytes = auth_string.encode("utf-8")
+    auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Basic {auth_base64}"
+    }
+    
+    payload = {
+        "source_addr": sender_id,
+        "encoding": 0,
+        "schedule_time": "",
+        "recipients": [{"recipient_id": 1, "dest_addr": phone_number}],
+        "message": message
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()  # Raise an error for HTTP codes 4XX/5XX
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending SMS: {e}")
+        return None
+
+
+
+
+def send_sms_nextsms(phone_number, message):
+    url = "https://messaging-service.co.tz/api/sms/v1/text/single"  # Test endpoint
+    username = "dimoso"  # Replace with your actual username
+    password = "Dimoso@9898"  # Replace with your actual password
+    
+    # Construct the Base64 authorization header
+    auth_string = f"{username}:{password}"
+    auth_header = f"Basic {base64.b64encode(auth_string.encode('utf-8')).decode('utf-8')}"
+
+    headers = {
+        "Content-Type": "application/json",
+        "Accept": "application/json",
+        "Authorization": auth_header,
+    }
+
+    payload = {
+        "from": "GGJ MKOPO",  # Replace with your approved sender ID
+        "to": phone_number,  # Single phone number as a string
+        "text": message,  # Message text
+        "reference": "your-reference"  # Optional: Add a unique reference
+    }
+
+    try:
+        # Make the POST request
+        response = requests.post(url, json=payload, headers=headers)
+        
+        # Debugging: Print response details
+        print(f"Status Code: {response.status_code}")
+        print(f"Response Content: {response.text}")
+        
+        # Raise an exception for HTTP errors
+        response.raise_for_status()
+        
+        # Parse and return JSON response
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending SMS via NextSMS: {e}")
+        return None
+
+
+
+
+def send_sms_beem(phone_number, message):
+    """
+    Sends an SMS using Beem Africa API.
+
+    :param phone_number: The recipient's phone number in international format (e.g., +255XXXXXXXXX)
+    :param message: The message to send
+    """
+    url = os.getenv("BEEM_ACCOUNT_URL")
+    api_key = os.getenv("BEEM_ACCOUNT_API_KEY")
+    secret_key = os.getenv("BEEM_ACCOUNT_SECRET_KEY")
+    sender_id = os.getenv("BEEM_ACCOUNT_SENDER_ID")
+
+    # Encode API key and secret key in base64
+    auth_string = f"{api_key}:{secret_key}"
+    auth_bytes = auth_string.encode("utf-8")
+    auth_base64 = base64.b64encode(auth_bytes).decode("utf-8")
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Basic {auth_base64}"
+    }
+
+    payload = {
+        "source_addr": sender_id,
+        "encoding": 0,
+        "schedule_time": "",
+        "recipients": [{"recipient_id": 1, "dest_addr": phone_number}],
+        "message": message
+    }
+
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        response.raise_for_status()
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Error sending SMS via Beem Africa: {e}")
+        return None
+
+
+
+
+
+class SendSMSNextSMSView(View):
+    def get(self, request):
+        """
+        Sends SMS to all users in the MyUser model using NextSMS.
+        """
+        users = MyUser.objects.all()
+        message = "Hello! This is a test message from NextSMS."
+
+        for user in users:
+            if user.phone:
+                phone_number = f"255{user.phone}"
+                send_sms_nextsms(phone_number, message)
+
+        return JsonResponse({"status": "success", "message": "SMS sent to all users via NextSMS."})
+
+class SendSMSBeemView(View):
+    def get(self, request):
+        """
+        Sends SMS to all users in the MyUser model using Beem Africa.
+        """
+        users = MyUser.objects.all()
+        message = "Hello! This is a test message from Beem Africa."
+
+        for user in users:
+            if user.phone:
+                send_sms_beem(user.phone, message)
+
+        return JsonResponse({"status": "success", "message": "SMS sent to all users via Beem Africa."})
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class ChangePasswordView(APIView):
@@ -322,25 +496,13 @@ class CountHawajarejeshaJanaView(APIView):
             )
 
 
+
+
+
 class AddWatejaWoteView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    # def send_sms(self, phone_number, message):
-    #     """Send SMS using Beem Africa API."""
-    #     try:
-    #         sms = BeemSms(
-    #             api_key=settings.BEEM_API_KEY,
-    #             secret_key=settings.BEEM_API_SECRET,
-    #         )
-    #         response = sms.send_sms(
-    #             sender_id=settings.BEEM_SENDER_ID,
-    #             recipients=[f'+255{phone_number}'],  # Ensure correct format
-    #             message=message
-    #         )
-    #         return response
-    #     except Exception as e:
-    #         return {"error": str(e)}
 
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -423,6 +585,20 @@ class AddWatejaWoteView(APIView):
             # sms_response = self.send_sms(phone_number, message)
 
             print(f"Simu Ya Mteja {SimuYaMteja}")
+
+
+            # Sending SMS after registration
+            message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
+            phone_number = f"255{SimuYaMteja}"
+            sms_response = send_sms_nextsms(phone_number, message)
+            print(f"Sms kwa mteja {JinaKamiliLaMteja}")
+            
+            if sms_response:
+                return JsonResponse({"message": "User registered and SMS sent successfully!"}, status=201)
+            else:
+                return JsonResponse({"error": "User registered but failed to send SMS."}, status=500)
+
+            #Mwisho wa kutuma sms
 
             
 
@@ -588,6 +764,19 @@ class UpdateWatejaWotePostView(APIView):
                 #                 #to='+255744973421'
                 #                 to =f"+255{wateja.SimuYaMteja}"
                 #             )
+
+                # Sending SMS after registration
+                message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
+                phone_number = f"255{SimuYaMteja}"
+                sms_response = send_sms_nextsms(phone_number, message)
+                print(f"Sms kwa mteja {JinaKamiliLaMteja}")
+                
+                if sms_response:
+                    return JsonResponse({"message": "User registered and SMS sent successfully!"}, status=201)
+                else:
+                    return JsonResponse({"error": "User registered but failed to send SMS."}, status=500)
+
+                #Mwisho wa kutuma sms
 
                 
 
@@ -935,6 +1124,19 @@ class WatejaWoteCartView(APIView):
             reg_no=Mteja.reg_no,
             RejeshoLililoPokelewaLeo=KiasiChaRejeshoChaSiku
         )
+
+        # Sending SMS after registration
+        message = f"Ndugu {Mteja.JinaKamiliLaMteja}, tumepokea rejesho lako la Tsh {KiasiChaRejeshoChaSiku}/= tarehe {today}. Deni lako ni Tsh {Mteja.JumlaYaDeni}/= \n Mawasiliano: 0621690739 / 0747462389. "
+        phone_number = f"255{Mteja.SimuYaMteja}"
+        sms_response = send_sms_nextsms(phone_number, message)
+        print(f"Sms kwa mteja {Mteja.JinaKamiliLaMteja}")
+        
+        if sms_response:
+            return JsonResponse({"message": "User registered and SMS sent successfully!"}, status=201)
+        else:
+            return JsonResponse({"error": "User registered but failed to send SMS."}, status=500)
+
+        #Mwisho wa kutuma sms
 
         # Email notification to admin
         myemail = "juniordimoso8@gmail.com"
