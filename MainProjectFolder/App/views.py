@@ -577,6 +577,8 @@ class AddWatejaWoteView(APIView):
             wateja.Nje_Ya_Mkata_Leo = False
             wateja.Wamemaliza_Hawajakopa_Tena = False
 
+            
+
             wateja.save()
 
             # Send SMS notification to the registered mteja
@@ -587,24 +589,25 @@ class AddWatejaWoteView(APIView):
             print(f"Simu Ya Mteja {SimuYaMteja}")
 
 
-            # Sending SMS after registration
+            # Send SMS notification to the registered mteja
             message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
             phone_number = f"255{SimuYaMteja}"
-            sms_response = send_sms_nextsms(phone_number, message)
-            print(f"Sms kwa mteja {JinaKamiliLaMteja}")
+
+            sms_response = None
+            try:
+                sms_response = send_sms_nextsms(phone_number, message)
+                if sms_response:
+                    print(f"SMS sent successfully to {JinaKamiliLaMteja}.")
+                else:
+                    print(f"Failed to send SMS to {JinaKamiliLaMteja}.")
+            except Exception as e:
+                print(f"Error during SMS sending: {e}")
+
             
-            if sms_response:
-                return JsonResponse({"message": "User registered and SMS sent successfully!"}, status=201)
-            else:
-                return JsonResponse({"error": "User registered but failed to send SMS."}, status=500)
-
-            #Mwisho wa kutuma sms
 
             
 
-            
-
-            # Email notification to admin
+            # # Email notification to admin
             myemail = "juniordimoso8@gmail.com"
             subject = "GGJ - MKOPO"
             message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
@@ -766,17 +769,20 @@ class UpdateWatejaWotePostView(APIView):
                 #             )
 
                 # Sending SMS after registration
+                
+                # Send SMS notification to the registered mteja
                 message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
                 phone_number = f"255{SimuYaMteja}"
-                sms_response = send_sms_nextsms(phone_number, message)
-                print(f"Sms kwa mteja {JinaKamiliLaMteja}")
-                
-                if sms_response:
-                    return JsonResponse({"message": "User registered and SMS sent successfully!"}, status=201)
-                else:
-                    return JsonResponse({"error": "User registered but failed to send SMS."}, status=500)
 
-                #Mwisho wa kutuma sms
+                sms_response = None
+                try:
+                    sms_response = send_sms_nextsms(phone_number, message)
+                    if sms_response:
+                        print(f"SMS sent successfully to {JinaKamiliLaMteja}.")
+                    else:
+                        print(f"Failed to send SMS to {JinaKamiliLaMteja}.")
+                except Exception as e:
+                    print(f"Error during SMS sending: {e}")
 
                 
 
@@ -1125,18 +1131,18 @@ class WatejaWoteCartView(APIView):
             RejeshoLililoPokelewaLeo=KiasiChaRejeshoChaSiku
         )
 
-        # Sending SMS after registration
         message = f"Ndugu {Mteja.JinaKamiliLaMteja}, tumepokea rejesho lako la Tsh {KiasiChaRejeshoChaSiku}/= tarehe {today}. Deni lako ni Tsh {Mteja.JumlaYaDeni}/= \n Mawasiliano: 0621690739 / 0747462389. "
         phone_number = f"255{Mteja.SimuYaMteja}"
-        sms_response = send_sms_nextsms(phone_number, message)
-        print(f"Sms kwa mteja {Mteja.JinaKamiliLaMteja}")
-        
-        if sms_response:
-            return JsonResponse({"message": "User registered and SMS sent successfully!"}, status=201)
-        else:
-            return JsonResponse({"error": "User registered but failed to send SMS."}, status=500)
 
-        #Mwisho wa kutuma sms
+        sms_response = None
+        try:
+            sms_response = send_sms_nextsms(phone_number, message)
+            if sms_response:
+                print(f"SMS sent successfully to {Mteja.JinaKamiliLaMteja}.")
+            else:
+                print(f"Failed to send SMS to {Mteja.JinaKamiliLaMteja}.")
+        except Exception as e:
+            print(f"Error during SMS sending: {e}")
 
         # Email notification to admin
         myemail = "juniordimoso8@gmail.com"
