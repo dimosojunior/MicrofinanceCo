@@ -2689,6 +2689,19 @@ class TumaMsgKwaMtejaView(APIView):
         if serializer.is_valid():
             wateja = serializer.save()
 
+            message = f"Ndugu {JinaKamiliLaMteja}, {Message}. \n Kiasi ulichokopa ni Tsh. {KiasiAnachokopa} \n Kiasi ulicholipa ni Tsh. {KiasiAlicholipa} \n jumla ya deni lililobaki ni Tsh. {JumlaYaDeni}  \n Kwa mawasiliano zaidi piga simu namba 0628431507"
+            phone_number = f"255{wateja.SimuYaMteja}"
+
+            sms_response = None
+            try:
+                sms_response = send_sms_nextsms(phone_number, message)
+                if sms_response:
+                    print(f"SMS sent successfully to {JinaKamiliLaMteja}.")
+                else:
+                    print(f"Failed to send SMS to {JinaKamiliLaMteja}.")
+            except Exception as e:
+                print(f"Error during SMS sending: {e}")
+
             
 
             # Email notification to admin
