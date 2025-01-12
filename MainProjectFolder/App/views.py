@@ -591,7 +591,7 @@ class AddWatejaWoteView(APIView):
 
             # Send SMS notification to the registered mteja
             message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
-            phone_number = f"255{SimuYaMteja}"
+            phone_number = f"255{wateja.SimuYaMteja}"
 
             sms_response = None
             try:
@@ -772,7 +772,7 @@ class UpdateWatejaWotePostView(APIView):
                 
                 # Send SMS notification to the registered mteja
                 message = f"Ndugu {JinaKamiliLaMteja}, umepokea mkopo wa Tsh {deni_plus_riba}/=, unatakiwa umalize kurejesha tarehe {wateja.Up_To}. \n Hatua zitachukuliwa kama hutomaliza. \n Mawasiliano: 0621690739 / 0747462389."
-                phone_number = f"255{SimuYaMteja}"
+                phone_number = f"255{wateja.SimuYaMteja}"
 
                 sms_response = None
                 try:
