@@ -261,23 +261,23 @@ def run():
                     'Created',
                     'Up_To'
                 ])
-                send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
+                #send_email(mteja, f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389")
 
 
                 # Sending SMS after registration
-                message = f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389"
+                # message = f"Ndugu mteja {mteja.JinaKamiliLaMteja} mkataba wako umejibadilisha leo. Deni lako jipya ni Tsh {deni_plus_riba}/=, rejesha mpaka tarehe {tarehe_ya_kumaliza}. \n Hatua zitachukuliwa ikiwa hutomaliza. \n Mawasiliano: 0621690739 / 0747462389"
                 
-                phone_number = f"255{mteja.SimuYaMteja}"
+                # phone_number = f"255{mteja.SimuYaMteja}"
 
-                sms_response = None
-                try:
-                    sms_response = send_sms_nextsms(phone_number, message)
-                    if sms_response:
-                        print(f"SMS sent successfully to {mteja.JinaKamiliLaMteja}.")
-                    else:
-                        print(f"Failed to send SMS to {mteja.JinaKamiliLaMteja}.")
-                except Exception as e:
-                    print(f"Error during SMS sending: {e}")
+                # sms_response = None
+                # try:
+                #     sms_response = send_sms_nextsms(phone_number, message)
+                #     if sms_response:
+                #         print(f"SMS sent successfully to {mteja.JinaKamiliLaMteja}.")
+                #     else:
+                #         print(f"Failed to send SMS to {mteja.JinaKamiliLaMteja}.")
+                # except Exception as e:
+                #     print(f"Error during SMS sending: {e}")
                 
 
                 #Mwisho wa kutuma sms
